@@ -29,10 +29,10 @@
     <QtUic Include="mySniffer.ui">
       <Filter>Form Files</Filter>
     </QtUic>
-    <QtMoc Include="mySniffer.h">
+    <QtMoc Include="mainWidget.h">
       <Filter>Header Files</Filter>
     </QtMoc>
-    <ClCompile Include="mySniffer.cpp">
+    <ClCompile Include="mainWidget.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -40,5 +40,13 @@
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="packetCap.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="packetCap.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
