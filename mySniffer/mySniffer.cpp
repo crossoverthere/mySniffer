@@ -8,3 +8,8 @@ mySniffer::mySniffer(QWidget *parent)
 
 mySniffer::~mySniffer()
 {}
+
+void mySniffer::click_on_cap() {
+    ui.button_uncap->setEnabled(true);
+    ui.button_cap->setDisabled(true);
+}

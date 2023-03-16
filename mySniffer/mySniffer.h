@@ -13,4 +13,7 @@ public:
 
 private:
     Ui::mySnifferClass ui;
+
+private slots:
+    void click_on_cap();
 };
