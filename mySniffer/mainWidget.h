@@ -20,4 +20,7 @@ private:
 
 private slots:
     void click_on_capBtn();
+    void click_on_uncapBtn();
+    void select_on_netCmb();
+    void select_on_filterCmb();
 };

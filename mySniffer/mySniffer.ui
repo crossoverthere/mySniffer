@@ -199,13 +199,38 @@
        </property>
        <item>
         <property name="text">
-         <string>请选择过滤规则</string>
+         <string>请选择过滤规则(可选)</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>TCP</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>UDP</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>IP</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>ICMP</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>ARP</string>
         </property>
        </item>
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="button_cap">
+      <widget class="QPushButton" name="Btn_cap">
        <property name="maximumSize">
         <size>
          <width>80</width>
@@ -218,7 +243,7 @@
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="button_uncap">
+      <widget class="QPushButton" name="Btn_uncap">
        <property name="enabled">
         <bool>false</bool>
        </property>
@@ -234,12 +259,12 @@
       </widget>
      </item>
     </layout>
-    <zorder>button_cap</zorder>
+    <zorder>Btn_cap</zorder>
     <zorder>label_net</zorder>
     <zorder>comboBox_net</zorder>
     <zorder>label_filter</zorder>
     <zorder>comboBox_filter</zorder>
-    <zorder>button_uncap</zorder>
+    <zorder>Btn_uncap</zorder>
    </widget>
    <zorder>treeWidget</zorder>
    <zorder>textBrowser</zorder>
@@ -312,8 +337,92 @@
  <resources>
   <include location="mySniffer.qrc"/>
  </resources>
- <connections/>
+ <connections>
+  <connection>
+   <sender>actionExit</sender>
+   <signal>triggered()</signal>
+   <receiver>mySnifferClass</receiver>
+   <slot>close()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>444</x>
+     <y>329</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>Btn_cap</sender>
+   <signal>clicked()</signal>
+   <receiver>mySnifferClass</receiver>
+   <slot>click_on_capBtn()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>731</x>
+     <y>76</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>736</x>
+     <y>109</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>Btn_uncap</sender>
+   <signal>clicked()</signal>
+   <receiver>mySnifferClass</receiver>
+   <slot>click_on_uncapBtn()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>818</x>
+     <y>70</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>851</x>
+     <y>108</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>comboBox_net</sender>
+   <signal>currentIndexChanged(int)</signal>
+   <receiver>mySnifferClass</receiver>
+   <slot>select_on_netCmb()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>210</x>
+     <y>75</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>211</x>
+     <y>107</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>comboBox_filter</sender>
+   <signal>currentIndexChanged(int)</signal>
+   <receiver>mySnifferClass</receiver>
+   <slot>select_on_filterCmb()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>520</x>
+     <y>72</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>521</x>
+     <y>111</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
  <slots>
-  <slot>click_on_cap()</slot>
+  <slot>click_on_capBtn()</slot>
+  <slot>click_on_uncapBtn()</slot>
+  <slot>select_on_netCmb()</slot>
+  <slot>select_on_filterCmb()</slot>
  </slots>
 </ui>

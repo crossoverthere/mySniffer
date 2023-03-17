@@ -6,7 +6,7 @@ MainWidget::MainWidget(QWidget *parent)
     ui.setupUi(this);
     packetCap = new PacketCapture();
 
-    // 检测有无网卡设备
+    // 初始化网卡列表选项
     QString devName;
     int i = 0;
     if (packetCap->hasDevs()) {
@@ -36,6 +36,30 @@ MainWidget::~MainWidget()
 }
 
 void MainWidget::click_on_capBtn() {
-    ui.button_uncap->setEnabled(true);
-    ui.button_cap->setDisabled(true);
+    ui.Btn_cap->setEnabled(false);
+    ui.Btn_uncap->setEnabled(true);
+}
+
+void MainWidget::click_on_uncapBtn() {
+    ui.Btn_cap->setEnabled(true);
+    ui.Btn_uncap->setEnabled(false);
+}
+
+void MainWidget::select_on_netCmb() {
+    int idx = ui.comboBox_net->currentIndex();
+    // 根据当前项设置监听网卡设备
+    this->packetCap->setDev(idx);
+}
+
+void MainWidget::select_on_filterCmb() {
+    QString filter;
+    if (ui.comboBox_filter->currentIndex() == 0) {
+        filter = "";
+    }
+    else {
+        filter = ui.comboBox_filter->currentText();
+    }
+    filter = filter.toLower();
+    // 根据当前项设置过滤规则
+    this->packetCap->setFilter(filter);
 }
