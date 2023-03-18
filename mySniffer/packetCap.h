@@ -6,18 +6,23 @@
 #include <pcap.h>
 #include <string>
 #include <QString>
+#include "qSignal.h"
 
+DWORD WINAPI captureThread(LPVOID lpParam);
 
 class PacketCapture {
 public:
-	PacketCapture();
+	PacketCapture(QSignal* p);
 	~PacketCapture();
 
 private:
+	QSignal* qs;					// 自定义信号类
+
 	pcap_if_t* allDevs;				// 所有网卡设备
 	pcap_if_t* pdev;
 	pcap_t* handle;					// 网卡接口
 	std::string filter;				// 过滤器
+	HANDLE capThreadHandle;			// 线程
 
 	char errBuf[PCAP_ERRBUF_SIZE];
 

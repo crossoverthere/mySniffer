@@ -94,6 +94,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="packetCap.cpp" />
+    <ClCompile Include="qSignal.cpp" />
     <QtRcc Include="mySniffer.qrc" />
     <QtUic Include="mySniffer.ui" />
     <QtMoc Include="mainWidget.h" />
@@ -102,6 +103,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="packetCap.h" />
+    <QtMoc Include="qSignal.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="cpp.hint" />

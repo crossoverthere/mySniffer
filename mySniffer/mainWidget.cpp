@@ -4,7 +4,11 @@ MainWidget::MainWidget(QWidget *parent)
     : QMainWindow(parent)
 {
     ui.setupUi(this);
-    packetCap = new PacketCapture();
+
+    qs = new QSignal();
+    connect(qs, SIGNAL(sendData(int)), this, SLOT(receiveData(int)));
+
+    packetCap = new PacketCapture(qs);
 
     // 初始化网卡列表选项
     QString devName;
@@ -32,12 +36,19 @@ MainWidget::MainWidget(QWidget *parent)
 
 MainWidget::~MainWidget()
 {
+    delete qs;
     delete packetCap;
 }
 
 void MainWidget::click_on_capBtn() {
     ui.Btn_cap->setEnabled(false);
     ui.Btn_uncap->setEnabled(true);
+    if (this->packetCap->initCapture() == 0) {
+        ui.label_filter->setText("success");
+    }
+    else {
+        ui.label_filter->setText("failed");
+    }
 }
 
 void MainWidget::click_on_uncapBtn() {
@@ -62,4 +73,8 @@ void MainWidget::select_on_filterCmb() {
     filter = filter.toLower();
     // 根据当前项设置过滤规则
     this->packetCap->setFilter(filter);
+}
+
+void MainWidget::receiveData(int v) {
+    ui.comboBox_filter->addItem(QString::number(v));
 }

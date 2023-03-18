@@ -1,9 +1,10 @@
 ﻿#include "packetCap.h"
 
 
-PacketCapture::PacketCapture() {
+PacketCapture::PacketCapture(QSignal* p) {
 	this->pdev = NULL;
 	this->handle = NULL;
+	this->qs = p;
 
 	// 初始化网卡设备信息
 	if (pcap_findalldevs(&allDevs, errBuf) == -1) {
@@ -49,6 +50,7 @@ void PacketCapture::setFilter(QString& flt) {
 	this->filter = flt.toStdString();
 }
 
+/* 抓包前相关配置 */
 int PacketCapture::initCapture() {
 	bpf_program fp;
 	bpf_u_int32 netmask;		// 网络掩码
@@ -83,6 +85,17 @@ int PacketCapture::initCapture() {
 	if (pcap_setfilter(handle, &fp) == PCAP_ERROR) {
 		return -1;
 	}
+
+	LPDWORD threadCap = NULL;
+	capThreadHandle = CreateThread(NULL, 0, captureThread, this, 0, threadCap);
+	if (capThreadHandle == NULL) {
+		return -1;
+	}
 	return 0;
 }
 
+
+/* 用于抓包的线程 */
+DWORD WINAPI captureThread(LPVOID lpParameter) {
+	while (1);
+}
