@@ -6,8 +6,6 @@ MainWidget::MainWidget(QWidget *parent)
     ui.setupUi(this);
 
     qs = new QSignal();
-    connect(qs, SIGNAL(sendData(int)), this, SLOT(receiveData(int)));
-
     packetCap = new PacketCapture(qs);
 
     // 初始化网卡列表选项
@@ -32,6 +30,9 @@ MainWidget::MainWidget(QWidget *parent)
         ui.comboBox_net->clear();
         ui.comboBox_net->addItem("未发现网卡设备");
     }
+
+    // 设置connect
+    connect(qs, SIGNAL(sendData(int)), this, SLOT(receiveData(int)));
 }
 
 MainWidget::~MainWidget()
@@ -75,6 +76,7 @@ void MainWidget::select_on_filterCmb() {
     this->packetCap->setFilter(filter);
 }
 
+// 接收后端信号，并作出响应
 void MainWidget::receiveData(int v) {
     ui.comboBox_filter->addItem(QString::number(v));
 }

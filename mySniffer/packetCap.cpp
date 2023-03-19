@@ -4,6 +4,7 @@
 PacketCapture::PacketCapture(QSignal* p) {
 	this->pdev = NULL;
 	this->handle = NULL;
+	this->capThreadHandle = NULL;
 	this->qs = p;
 
 	// 初始化网卡设备信息
@@ -29,6 +30,11 @@ bool PacketCapture::hasDevs() {
 
 pcap_if_t* PacketCapture::getDevsInfo() {
 	return this->allDevs;
+}
+
+/* 获取网卡接口 */
+pcap_t* PacketCapture::getHandle() {
+	return this->handle;
 }
 
 void PacketCapture::setDev(int idx) {
@@ -86,7 +92,8 @@ int PacketCapture::initCapture() {
 		return -1;
 	}
 
-	LPDWORD threadCap = NULL;
+	/* 开启一个线程 */
+	LPDWORD threadCap = NULL;		// 线程标识符
 	capThreadHandle = CreateThread(NULL, 0, captureThread, this, 0, threadCap);
 	if (capThreadHandle == NULL) {
 		return -1;
@@ -97,5 +104,35 @@ int PacketCapture::initCapture() {
 
 /* 用于抓包的线程 */
 DWORD WINAPI captureThread(LPVOID lpParameter) {
-	while (1);
+	PacketCapture* pthis = (PacketCapture*)lpParameter;
+	pcap_t* phandle = pthis->getHandle();
+
+	pcap_pkthdr* pktHeader;			// 接收报文头部
+	const u_char* pktData;			// 接收报文数据
+	int res;
+
+	// 数据报捕获
+	while ((res = pcap_next_ex(phandle, &pktHeader, &pktData) >= 0)) {
+		// 超时
+		if (res == 0) {
+			continue;
+		}	
+
+		// 申请一份内存保存抓包信息
+		PKTDATA* data = (PKTDATA*)malloc(sizeof(PKTDATA));
+		if (data == NULL) {
+			return -1;
+		}
+		else {
+			memset(data, 0, sizeof(PKTDATA));
+		}
+
+		// 对报文数据进行分析
+
+		// 保存数据包信息
+
+		// 更新包统计
+
+	}
+	return 1;
 }

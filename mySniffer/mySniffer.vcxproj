@@ -103,6 +103,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="packetCap.h" />
+    <ClInclude Include="protocol.h" />
     <QtMoc Include="qSignal.h" />
   </ItemGroup>
   <ItemGroup>
