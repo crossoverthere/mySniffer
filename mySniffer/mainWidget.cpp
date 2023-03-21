@@ -73,7 +73,7 @@ void MainWidget::select_on_filterCmb() {
     }
     filter = filter.toLower();
     // 根据当前项设置过滤规则
-    this->packetCap->setFilter(filter);
+    this->packetCap->setFilter(filter.toStdString());
 }
 
 // 接收后端信号，并作出响应

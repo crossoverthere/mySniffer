@@ -4,9 +4,6 @@
 * 自定义数据结构
 ************************************************/
 
-#define PROTO_ICMP 1
-#define PROTO_TCP 6					
-#define PROTO_UDP 17
 #define LITTLE_ENDIAN 1234
 #define BIG_ENDIAN    4321
 
@@ -116,7 +113,7 @@ typedef struct icmphdr {
 
 
 // IPv6
-typedef struct ipv6hdr {
+typedef struct ip6hdr {
 	unsigned int version : 4;	// 版本
 	unsigned int flowType : 8;	// 流类型
 	unsigned int flowLabel : 20;// 流标签
@@ -124,32 +121,32 @@ typedef struct ipv6hdr {
 	unsigned short plen;		// 有效载荷长度
 	unsigned char nh;			// 下一个报头
 	unsigned char hlim;			// 跳跃限制
-	unsigned short srcAddr[8];	// 源地址
-	unsigned short destAddr[8];	// 目的地址
-}IPv6_HEADER;
+	unsigned char srcAddr[16];	// 源地址
+	unsigned char destAddr[16];	// 目的地址
+}IP6_HEADER;
 
 
 // ICMPv6
-typedef struct icmpv6hdr {
-	u_char type;				// 类型
-	u_char code;				// 代码
-	u_char seq;					// 序号
-	u_char chksum;				// 校验和
-	u_char op_type;				// 选项: 类型
-	u_char op_len;				// 选项: 长度
-	u_char op_ethaddr[6];		// 选项: 链路层地址
-}ICMPv6_HEADER;
+typedef struct icmp6hdr {
+	unsigned char type;			// 类型
+	unsigned char code;			// 代码
+	unsigned char seq;			// 序号
+	unsigned char chksum;		// 校验和
+	unsigned char op_type;		// 选项: 类型
+	unsigned char op_len;		// 选项: 长度
+	unsigned char op_ethaddr[6];// 选项: 链路层地址
+}ICMP6_HEADER;
 
 
 // 包统计
 typedef struct pktcount {
 	int n_ip;
-	int n_ipv6;
+	int n_ip6;
 	int n_arp;
 	int n_tcp;
 	int n_udp;
 	int n_icmp;
-	int n_icmpv6;
+	int n_icmp6;
 	int n_http;
 	int n_other;
 	int n_sum;
@@ -166,10 +163,10 @@ typedef struct pktdata {
 	ARP_HEADER* arph;			// ARP报头
 
 	IP_HEADER* iph;				// IP报头
-	IPv6_HEADER* ip6h;			// IPv6报头
+	IP6_HEADER* ip6h;			// IPv6报头
 
 	ICMP_HEADER* icmph;			// ICMP报头
-	ICMPv6_HEADER* icmp6h;		// ICMPv6报头
+	ICMP6_HEADER* icmp6h;		// ICMPv6报头
 
 	TCP_HEADER* tcph;			// TCP报头
 	UDP_HEADER* udph;			// UDP报头

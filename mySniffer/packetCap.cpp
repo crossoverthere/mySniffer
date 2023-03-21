@@ -32,11 +32,6 @@ pcap_if_t* PacketCapture::getDevsInfo() {
 	return this->allDevs;
 }
 
-/* 获取网卡接口 */
-pcap_t* PacketCapture::getHandle() {
-	return this->handle;
-}
-
 void PacketCapture::setDev(int idx) {
 	// 设置所选网卡设备
 	if (idx != 0) {
@@ -52,8 +47,9 @@ void PacketCapture::setDev(int idx) {
 	}
 }
 
-void PacketCapture::setFilter(QString& flt) {
-	this->filter = flt.toStdString();
+/* 设置过滤器 */
+void PacketCapture::setFilter(string flt) {
+	this->filter = flt;
 }
 
 /* 抓包前相关配置 */
@@ -105,14 +101,13 @@ int PacketCapture::initCapture() {
 /* 用于抓包的线程 */
 DWORD WINAPI captureThread(LPVOID lpParameter) {
 	PacketCapture* pthis = (PacketCapture*)lpParameter;
-	pcap_t* phandle = pthis->getHandle();
 
 	pcap_pkthdr* pktHeader;			// 接收报文头部
-	const u_char* pktData;			// 接收报文数据
+	const uchar* pktData;			// 接收报文数据
 	int res;
 
 	// 数据报捕获
-	while ((res = pcap_next_ex(phandle, &pktHeader, &pktData) >= 0)) {
+	while ((res = pcap_next_ex(pthis->handle, &pktHeader, &pktData) >= 0)) {
 		// 超时
 		if (res == 0) {
 			continue;
