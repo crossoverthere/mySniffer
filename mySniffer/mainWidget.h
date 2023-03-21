@@ -24,7 +24,9 @@ private slots:
     void select_on_netCmb();
     void select_on_filterCmb();
 
-    void receiveData(int v);        // 接受后端信号
+    /* 由后端触发 */
+    void update_on_tableview(PKTDATA* data);     // 更新表格信息
+    void receiveData(int v);
 
 public:
     QSignal *qs;

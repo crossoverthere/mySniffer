@@ -32,7 +32,8 @@ MainWidget::MainWidget(QWidget *parent)
     }
 
     // 设置connect
-    connect(qs, SIGNAL(sendData(int)), this, SLOT(receiveData(int)));
+    connect(qs, SIGNAL(testSignal(int)), this, SLOT(receiveData(int)));
+    connect(qs, SIGNAL(labelSignal(PKTDATA*)), this, SLOT(update_on_tableview(PKTDATA*)));
 }
 
 MainWidget::~MainWidget()
@@ -42,17 +43,20 @@ MainWidget::~MainWidget()
 }
 
 void MainWidget::click_on_capBtn() {
+    // 开启抓包进程
+    packetCap->setFlag(true);
+    int res = packetCap->initCapture();
+
+    if (res == 1) {
+        ui.Btn_cap->setText("已开启");
+    }
+
     ui.Btn_cap->setEnabled(false);
     ui.Btn_uncap->setEnabled(true);
-    if (this->packetCap->initCapture() == 0) {
-        ui.label_filter->setText("success");
-    }
-    else {
-        ui.label_filter->setText("failed");
-    }
 }
 
 void MainWidget::click_on_uncapBtn() {
+    packetCap->setFlag(false);
     ui.Btn_cap->setEnabled(true);
     ui.Btn_uncap->setEnabled(false);
 }
@@ -79,4 +83,52 @@ void MainWidget::select_on_filterCmb() {
 // 接收后端信号，并作出响应
 void MainWidget::receiveData(int v) {
     ui.comboBox_filter->addItem(QString::number(v));
+}
+
+// 更新lable表格
+void::MainWidget::update_on_tableview(PKTDATA* data) {
+    //ui.Btn_uncap->setText("sucess");
+    QString str;
+    int row = ui.tableWidget->rowCount();
+    ui.tableWidget->setRowCount(row + 1);
+    // 显示序号
+    str = QString::number(row + 1);
+    ui.tableWidget->setItem(row, 0, new QTableWidgetItem(str));
+    // 显示时间戳
+    str = QString::asprintf("%d/%d/%d-%d:%d:%d",
+        data->time[0], data->time[1], data->time[2], data->time[3], data->time[4], data->time[5]);
+    ui.tableWidget->setItem(row, 1, new QTableWidgetItem(str));
+    // 显示协议
+    str = QString(data->pktType);
+    ui.tableWidget->setItem(row, 2, new QTableWidgetItem(str));
+    // 显示长度
+    str = QString::asprintf("%d", data->len);
+    ui.tableWidget->setItem(row, 3, new QTableWidgetItem(str));
+    // 显示源MAC
+    str = QString::asprintf("%02X-%02X-%02X-%02X-%02X-%02X", data->mach->src[0], data->mach->src[1],
+        data->mach->src[2], data->mach->src[3], data->mach->src[4], data->mach->src[5]);
+    ui.tableWidget->setItem(row, 4, new QTableWidgetItem(str));
+    // 显示目的MAC
+    str = QString::asprintf("%02X-%02X-%02X-%02X-%02X-%02X", data->mach->dest[0], data->mach->dest[1],
+        data->mach->dest[2], data->mach->dest[3], data->mach->dest[4], data->mach->dest[5]);
+    ui.tableWidget->setItem(row, 5, new QTableWidgetItem(str));
+    // 显示源IP地址
+    if (0x0806 == data->mach->type)
+    {
+        str = QString::asprintf("%d.%d.%d.%d", data->arph->srcIP[0],
+            data->arph->srcIP[1], data->arph->srcIP[2], data->arph->srcIP[3]);
+    }
+    else if (0x0800 == data->mach->type) {
+        struct  in_addr in;
+        in.S_un.S_addr = data->iph->srcIP;
+        str = QString(inet_ntoa(in));
+    }
+    else if (0x86dd == data->mach->type) {
+        str = QString::asprintf("%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:", data->ip6h->srcAddr[0], data->ip6h->srcAddr[1], 
+            data->ip6h->srcAddr[2], data->ip6h->srcAddr[3], data->ip6h->srcAddr[4], data->ip6h->srcAddr[5], data->ip6h->srcAddr[6], 
+            data->ip6h->srcAddr[7]);
+    }
+    ui.tableWidget->setItem(row, 6, new QTableWidgetItem(str));
+    // 显示目的IP地址
+
 }

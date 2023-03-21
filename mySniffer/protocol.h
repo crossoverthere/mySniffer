@@ -139,7 +139,7 @@ typedef struct icmp6hdr {
 
 
 // 包统计
-typedef struct pktcount {
+struct PKTCOUNT {
 	int n_ip;
 	int n_ip6;
 	int n_arp;
@@ -149,8 +149,21 @@ typedef struct pktcount {
 	int n_icmp6;
 	int n_http;
 	int n_other;
-	int n_sum;
-}PKTCOUNT;
+	int n_sum ;
+
+	PKTCOUNT() {
+		this->n_ip = 0;
+		this->n_ip6 = 0;
+		this->n_arp = 0;
+		this->n_tcp = 0;
+		this->n_udp = 0;
+		this->n_icmp = 0;
+		this->n_icmp6 = 0;
+		this->n_http = 0;
+		this->n_other = 0;
+		this->n_sum = 0;
+	}
+};
 
 
 // 抓包信息

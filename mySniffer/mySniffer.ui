@@ -72,12 +72,7 @@
     </column>
     <column>
      <property name="text">
-      <string>源MAC地址</string>
-     </property>
-    </column>
-    <column>
-     <property name="text">
-      <string>目的MAC地址</string>
+      <string>协议</string>
      </property>
     </column>
     <column>
@@ -87,7 +82,12 @@
     </column>
     <column>
      <property name="text">
-      <string>协议类型</string>
+      <string>源MAC地址</string>
+     </property>
+    </column>
+    <column>
+     <property name="text">
+      <string>目的MAC地址</string>
      </property>
     </column>
     <column>

@@ -22,10 +22,13 @@ int parsing_fram(const uchar* pkt, PKTDATA* data, PKTCOUNT* npkt) {
 	switch (data->mach->type)
 	{
 	case 0x0806:
+		return parsing_arp((uchar*)pkt + 14, data, npkt);
 		break;
 	case 0x0800:
+		return parsing_ip((uchar*)pkt + 14, data, npkt);
 		break;
 	case 0x86dd:
+		return parsing_ip6((uchar*)pkt + 14, data, npkt);
 		break;
 	default:
 		npkt->n_other++;
@@ -95,13 +98,13 @@ int parsing_ip(const uchar* pkt, PKTDATA* data, PKTCOUNT* npkt) {
 	switch (iph->proto)
 	{
 	case PROTO_ICMP:
-
+		return parsing_icmp((uchar*)iph + len, data, npkt);
 		break;
 	case PROTO_TCP:
-
+		return parsing_tcp((uchar*)iph + len, data, npkt);
 		break;
 	case PROTO_UDP:
-
+		return parsing_udp((uchar*)iph + len, data, npkt);
 		break;
 	default:
 		return -1;
@@ -112,7 +115,7 @@ int parsing_ip(const uchar* pkt, PKTDATA* data, PKTCOUNT* npkt) {
 
 
 /* 解析网络层 IPv6 */
-int parsing_ipv6(const uchar* pkt, PKTDATA* data, PKTCOUNT* npkt) {
+int parsing_ip6(const uchar* pkt, PKTDATA* data, PKTCOUNT* npkt) {
 	IP6_HEADER* ip6h = (IP6_HEADER*)pkt;
 
 	data->ip6h = (IP6_HEADER*)malloc(sizeof(IP6_HEADER));
@@ -137,10 +140,13 @@ int parsing_ipv6(const uchar* pkt, PKTDATA* data, PKTCOUNT* npkt) {
 	switch (ip6h->nh)
 	{
 	case 0x3a:
+		return parsing_icmp6((uchar*)ip6h + 40, data, npkt);
 		break;
 	case 0x06:
+		return parsing_tcp((uchar*)ip6h + 40, data, npkt);
 		break;
 	case 0x11:
+		return parsing_udp((uchar*)ip6h + 40, data, npkt);
 		break;
 	default:
 		return -1;

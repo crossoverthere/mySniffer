@@ -6,6 +6,7 @@
 ******************************/
 
 #include <QObject>
+#include "protocol.h"
 
 
 class QSignal  : public QObject
@@ -16,11 +17,8 @@ public:
 	QSignal();
 	~QSignal();
 
-public:
-	void emit_signal(int i) {
-		emit sendData(i);
-	}
-
 signals:
-	void sendData(int v);
+	void labelSignal(PKTDATA* data);
+signals:
+	void testSignal(int i);
 };
