@@ -4,6 +4,7 @@ MainWidget::MainWidget(QWidget *parent)
     : QMainWindow(parent)
 {
     ui.setupUi(this);
+    initUI();
 
     qs = new QSignal();
     packetCap = new PacketCapture(qs);
@@ -34,6 +35,8 @@ MainWidget::MainWidget(QWidget *parent)
     // 设置connect
     connect(qs, SIGNAL(testSignal(int)), this, SLOT(receiveData(int)));
     connect(qs, SIGNAL(labelSignal(PKTDATA*)), this, SLOT(update_on_tableview(PKTDATA*)));
+    connect(qs, SIGNAL(warningSignal(QString)), this, SLOT(sendWarning(QString)));
+    connect(qs, SIGNAL(criticalSignal(QString)), this, SLOT(sendCritical(QString)));
 }
 
 MainWidget::~MainWidget()
@@ -42,17 +45,32 @@ MainWidget::~MainWidget()
     delete packetCap;
 }
 
+void MainWidget::initUI() {
+    ui.tableWidget->setColumnWidth(0, 50);
+    ui.tableWidget->setColumnWidth(1, 120);
+    ui.tableWidget->setColumnWidth(2, 60);
+    ui.tableWidget->setColumnWidth(3, 50);
+    ui.tableWidget->setColumnWidth(4, 130);
+    ui.tableWidget->setColumnWidth(5, 130);
+    ui.tableWidget->setColumnWidth(6, 250);
+    ui.tableWidget->setColumnWidth(7, 250);
+    ui.tableWidget->horizontalHeader()->setSectionResizeMode(QHeaderView::Fixed);
+    ui.tableWidget->verticalHeader()->setHidden(true);
+}
+
 void MainWidget::click_on_capBtn() {
+    string erroinfo;
+    // 清空抓包列表
+    ui.tableWidget->clearContents();
+    ui.tableWidget->setRowCount(0);
     // 开启抓包进程
-    packetCap->setFlag(true);
-    int res = packetCap->initCapture();
-
-    if (res == 1) {
-        ui.Btn_cap->setText("已开启");
+    if (packetCap->initCapture(erroinfo) == -1) {
+        sendWarning(QString::fromStdString(erroinfo));
     }
-
-    ui.Btn_cap->setEnabled(false);
-    ui.Btn_uncap->setEnabled(true);
+    else {
+        ui.Btn_cap->setEnabled(false);
+        ui.Btn_uncap->setEnabled(true);
+    }
 }
 
 void MainWidget::click_on_uncapBtn() {
@@ -119,16 +137,42 @@ void::MainWidget::update_on_tableview(PKTDATA* data) {
             data->arph->srcIP[1], data->arph->srcIP[2], data->arph->srcIP[3]);
     }
     else if (0x0800 == data->mach->type) {
-        struct  in_addr in;
+        in_addr in;
         in.S_un.S_addr = data->iph->srcIP;
         str = QString(inet_ntoa(in));
     }
     else if (0x86dd == data->mach->type) {
-        str = QString::asprintf("%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x:", data->ip6h->srcAddr[0], data->ip6h->srcAddr[1], 
+        str = QString::asprintf("%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x", data->ip6h->srcAddr[0], data->ip6h->srcAddr[1], 
             data->ip6h->srcAddr[2], data->ip6h->srcAddr[3], data->ip6h->srcAddr[4], data->ip6h->srcAddr[5], data->ip6h->srcAddr[6], 
             data->ip6h->srcAddr[7]);
     }
     ui.tableWidget->setItem(row, 6, new QTableWidgetItem(str));
     // 显示目的IP地址
+    if (0x0806 == data->mach->type) {
+        str = QString::asprintf("%d.%d.%d.%d", data->arph->destIP[0],
+            data->arph->destIP[1], data->arph->destIP[2], data->arph->destIP[3]);
+    }
+    else if (0x0800 == data->mach->type) {
+        in_addr in;
+        in.S_un.S_addr = data->iph->destIP;
+        str = QString(inet_ntoa(in));
+    }
+    else if (0x86dd == data->mach->type) {
+        str = QString::asprintf("%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x", data->ip6h->destAddr[0], data->ip6h->destAddr[1],
+            data->ip6h->destAddr[2], data->ip6h->destAddr[3], data->ip6h->destAddr[4], data->ip6h->destAddr[5], data->ip6h->destAddr[6],
+            data->ip6h->destAddr[7]);
 
+    }
+    ui.tableWidget->setItem(row, 7, new QTableWidgetItem(str));
+}
+
+
+/* 提示窗口 */
+void MainWidget::sendWarning(QString str) {
+    QMessageBox::warning(this, tr("Warning"), str, 
+        QMessageBox::Ok, QMessageBox::Ok);
+}
+void MainWidget::sendCritical(QString str) {
+    QMessageBox::critical(this, tr("Error"), str,
+        QMessageBox::Ok, QMessageBox::Ok);
 }

@@ -6,6 +6,7 @@
 ******************************/
 
 #include <QObject>
+#include <string>
 #include "protocol.h"
 
 
@@ -20,5 +21,9 @@ public:
 signals:
 	void labelSignal(PKTDATA* data);
 signals:
+	void warningSignal(QString str);
+signals:
 	void testSignal(int i);
+signals:
+	void criticalSignal(std::string str);
 };

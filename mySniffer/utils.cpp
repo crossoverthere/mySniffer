@@ -12,8 +12,8 @@ int parsing_fram(const uchar* pkt, PKTDATA* data, PKTCOUNT* npkt) {
 
 	// 复制信息
 	for (int i = 0; i < 6; i++) {
-		data->mach->src[i] = mach->src[i];
 		data->mach->dest[i] = mach->dest[i];
+		data->mach->src[i] = mach->src[i];
 	}
 	data->mach->type = ntohs(mach->type);
 
@@ -82,15 +82,15 @@ int parsing_ip(const uchar* pkt, PKTDATA* data, PKTCOUNT* npkt) {
 	data->iph->hdrLen = iph->hdrLen;
 	data->iph->version = iph->version;
 	data->iph->tos = iph->tos;
-	data->iph->id = iph->id;
-	data->iph->flag_off = iph->flag_off;
+	data->iph->tLen = ntohs(iph->tLen);
+	data->iph->id = ntohs(iph->id);
+	data->iph->flag_off = ntohs(iph->flag_off);
 	data->iph->ttl = iph->ttl;
 	data->iph->proto = iph->proto;
-	data->iph->check = iph->check;
+	data->iph->check = ntohs(iph->check);
 	data->iph->srcIP = iph->srcIP;
 	data->iph->destIP = iph->destIP;
 	data->iph->option = iph->option;
-	data->iph->tLen = ntohs(iph->tLen);
 
 	npkt->n_ip++;
 	// 解析上层协议
@@ -124,16 +124,16 @@ int parsing_ip6(const uchar* pkt, PKTDATA* data, PKTCOUNT* npkt) {
 	}
 
 	// 复制信息
-	for (int i = 0; i < 16; i++) {
-		data->ip6h->srcAddr[i] = ip6h->srcAddr[i];
-		data->ip6h->destAddr[i] = ip6h->destAddr[i];
-	}
 	data->ip6h->version = ip6h->version;
 	data->ip6h->flowType = ip6h->flowType;
 	data->ip6h->flowLabel = ip6h->flowLabel;
+	data->ip6h->plen = ntohs(ip6h->plen);
 	data->ip6h->nh = ip6h->nh;
 	data->ip6h->hlim = ip6h->hlim;
-	data->ip6h->plen = ntohs(ip6h->plen);
+	for (int i = 0; i < 8; i++) {
+		data->ip6h->srcAddr[i] = ntohs(ip6h->srcAddr[i]);
+		data->ip6h->destAddr[i] = ntohs(ip6h->destAddr[i]);
+	}
 
 	npkt->n_ip6++;
 	// 解析上层协议

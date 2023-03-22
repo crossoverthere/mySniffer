@@ -121,8 +121,8 @@ typedef struct ip6hdr {
 	unsigned short plen;		// 有效载荷长度
 	unsigned char nh;			// 下一个报头
 	unsigned char hlim;			// 跳跃限制
-	unsigned char srcAddr[16];	// 源地址
-	unsigned char destAddr[16];	// 目的地址
+	unsigned short srcAddr[8];	// 源地址
+	unsigned short destAddr[8];	// 目的地址
 }IP6_HEADER;
 
 

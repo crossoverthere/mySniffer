@@ -41,7 +41,7 @@ public:
 	void setDev(int idx);				// 设置监听的网卡设备
 	void setFilter(string flt);			// 设置过滤器
 	void setFlag(bool f);
-	int initCapture();					// 初始化
+	int initCapture(string& info);		// 初始化
 	void updateNPKT();					// 更新抓包统计
 	void updateTableView(PKTDATA* data);// 更新抓包列表
 
