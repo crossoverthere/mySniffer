@@ -152,22 +152,13 @@ struct PKTCOUNT {
 	int n_sum ;
 
 	PKTCOUNT() {
-		this->n_ip = 0;
-		this->n_ip6 = 0;
-		this->n_arp = 0;
-		this->n_tcp = 0;
-		this->n_udp = 0;
-		this->n_icmp = 0;
-		this->n_icmp6 = 0;
-		this->n_http = 0;
-		this->n_other = 0;
-		this->n_sum = 0;
+		memset(this, 0, sizeof(PKTCOUNT));
 	}
 };
 
 
 // 抓包信息
-typedef struct pktdata {
+struct PKTDATA{
 	char pktType[8];			// 包类型
 	int time[6];				// 时间
 	int len;					// 长度
@@ -186,4 +177,15 @@ typedef struct pktdata {
 
 	void* apph;					//应用层报头
 
-} PKTDATA;
+	void freePtr() {
+		free(mach);
+		free(arph);
+		free(iph);
+		free(ip6h);
+		free(icmph);
+		free(icmp6h);
+		free(tcph);
+		free(udph);
+		free(apph);
+	}
+};

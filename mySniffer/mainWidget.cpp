@@ -35,6 +35,7 @@ MainWidget::MainWidget(QWidget *parent)
     // 设置connect
     connect(qs, SIGNAL(testSignal(int)), this, SLOT(receiveData(int)));
     connect(qs, SIGNAL(labelSignal(PKTDATA*)), this, SLOT(update_on_tableview(PKTDATA*)));
+    connect(qs, SIGNAL(statsSignal(PKTCOUNT*)), this, SLOT(updata_stats(PKTCOUNT*)));
     connect(qs, SIGNAL(warningSignal(QString)), this, SLOT(sendWarning(QString)));
     connect(qs, SIGNAL(criticalSignal(QString)), this, SLOT(sendCritical(QString)));
 }
@@ -56,6 +57,7 @@ void MainWidget::initUI() {
     ui.tableWidget->setColumnWidth(7, 250);
     ui.tableWidget->horizontalHeader()->setSectionResizeMode(QHeaderView::Fixed);
     ui.tableWidget->verticalHeader()->setHidden(true);
+    ui.tableWidget->setSelectionBehavior(QTableWidget::SelectRows);
 }
 
 void MainWidget::click_on_capBtn() {
@@ -63,6 +65,17 @@ void MainWidget::click_on_capBtn() {
     // 清空抓包列表
     ui.tableWidget->clearContents();
     ui.tableWidget->setRowCount(0);
+    // 清空统计记录
+    ui.lEdit_nip->setText(QString::number(0));
+    ui.lEdit_nip6->setText(QString::number(0));
+    ui.lEdit_narp->setText(QString::number(0));
+    ui.lEdit_ntcp->setText(QString::number(0));
+    ui.lEdit_nudp->setText(QString::number(0));
+    ui.lEdit_nhttp->setText(QString::number(0));
+    ui.lEdit_nicmp->setText(QString::number(0));
+    ui.lEdit_nicmp6->setText(QString::number(0));
+    ui.lEdit_sum->setText(QString::number(0));
+    ui.lEdit_other->setText(QString::number(0));
     // 开启抓包进程
     if (packetCap->initCapture(erroinfo) == -1) {
         sendWarning(QString::fromStdString(erroinfo));
@@ -70,13 +83,19 @@ void MainWidget::click_on_capBtn() {
     else {
         ui.Btn_cap->setEnabled(false);
         ui.Btn_uncap->setEnabled(true);
+        ui.comboBox_net->setEnabled(false);
+        ui.comboBox_filter->setEnabled(false);
     }
 }
 
 void MainWidget::click_on_uncapBtn() {
     packetCap->setFlag(false);
     ui.Btn_cap->setEnabled(true);
+    ui.Btn_cap->setText("重新开始");
+
     ui.Btn_uncap->setEnabled(false);
+    ui.comboBox_net->setEnabled(true);
+    ui.comboBox_filter->setEnabled(true);
 }
 
 void MainWidget::select_on_netCmb() {
@@ -96,6 +115,11 @@ void MainWidget::select_on_filterCmb() {
     filter = filter.toLower();
     // 根据当前项设置过滤规则
     this->packetCap->setFilter(filter.toStdString());
+}
+
+void MainWidget::select_on_tableview(int row, int col) {
+    QString str = QString::number(row);
+    ui.label->setText(str + "success");
 }
 
 // 接收后端信号，并作出响应
@@ -164,6 +188,20 @@ void::MainWidget::update_on_tableview(PKTDATA* data) {
 
     }
     ui.tableWidget->setItem(row, 7, new QTableWidgetItem(str));
+}
+
+// 更新抓包统计
+void MainWidget::updata_stats(PKTCOUNT* npkt) {
+    ui.lEdit_nip->setText(QString::number(npkt->n_ip));
+    ui.lEdit_nip6->setText(QString::number(npkt->n_ip6));
+    ui.lEdit_narp->setText(QString::number(npkt->n_arp));
+    ui.lEdit_ntcp->setText(QString::number(npkt->n_tcp));
+    ui.lEdit_nudp->setText(QString::number(npkt->n_udp));
+    ui.lEdit_nhttp->setText(QString::number(npkt->n_http));
+    ui.lEdit_nicmp->setText(QString::number(npkt->n_icmp));
+    ui.lEdit_nicmp6->setText(QString::number(npkt->n_icmp6));
+    ui.lEdit_sum->setText(QString::number(npkt->n_sum));
+    ui.lEdit_other->setText(QString::number(npkt->n_other));
 }
 
 

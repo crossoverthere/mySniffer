@@ -4,6 +4,9 @@
 /* 解析链路层 */
 int parsing_fram(const uchar* pkt, PKTDATA* data, PKTCOUNT* npkt) {
 	MAC_HEADER* mach = (MAC_HEADER*)pkt;
+	if (NULL == mach) {
+		return -1;
+	}
 
 	data->mach = (MAC_HEADER*)malloc(sizeof(MAC_HEADER));
 	if (NULL == data->mach) {

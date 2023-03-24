@@ -21,6 +21,8 @@ public:
 signals:
 	void labelSignal(PKTDATA* data);
 signals:
+	void statsSignal(PKTCOUNT* npkt);
+signals:
 	void warningSignal(QString str);
 signals:
 	void testSignal(int i);

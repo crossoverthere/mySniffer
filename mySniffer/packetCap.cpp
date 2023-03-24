@@ -58,15 +58,17 @@ void PacketCapture::setFlag(bool f) {
 }
 
 
-/* 更新抓包统计 */
-void PacketCapture::updateNPKT() {
+/* 清空数据链表 */
+void PacketCapture::clearAllData() {
+	// 释放所有指针后，清空列表
+	for (auto data : datalist) {
+		data->freePtr();
+		free(data);
+	}
+	datalist.clear();
 
-}
-
-/* 更新抓包列表 */
-void PacketCapture::updateTableView(PKTDATA* data) {
-	emit qs->labelSignal(data);
-	//emit qs->testSignal(1);
+	// 清除抓包统计
+	memset(&npkt, 0, sizeof(PKTCOUNT));
 }
 
 
@@ -142,8 +144,9 @@ DWORD WINAPI captureThread(LPVOID lpParameter) {
 		return -1;
 		emit pthis->qs->warningSignal("线程句柄错误");
 	}
-	//emit pthis->qs->warningSignal("测试");
-	//return -1;
+
+	// 清空上次抓包数据
+	pthis->clearAllData();
 
 	// 数据报捕获
 	while ((res = pcap_next_ex(pthis->handle, &pktHeader, &pktData) >= 0) && (pthis->flag == true)) {
@@ -152,9 +155,9 @@ DWORD WINAPI captureThread(LPVOID lpParameter) {
 			continue;
 		}	
 		//emit pthis->qs->testSignal(1);
-		if (NULL == pktData) {
-			continue;
-		}
+		//if (NULL == pktData) {
+		//	continue;
+		//}
 		// 申请一份内存保存抓包信息
 		PKTDATA* data = (PKTDATA*)malloc(sizeof(PKTDATA));
 		if (data == NULL) {
@@ -167,6 +170,7 @@ DWORD WINAPI captureThread(LPVOID lpParameter) {
 		//return -1;
 		// 对报文数据进行分析
 		if (parsing_fram(pktData, data, &(pthis->npkt)) < 0) {
+			free(data);
 			continue;
 		}
 
@@ -174,9 +178,7 @@ DWORD WINAPI captureThread(LPVOID lpParameter) {
 
 
 		// 更新抓包统计(主窗体)
-		pthis->updateNPKT();
-
-		// 数据存入链表以用于后续调用
+		emit pthis->qs->statsSignal(&(pthis->npkt));
 
 
 		// 处理时间、长度
@@ -190,7 +192,10 @@ DWORD WINAPI captureThread(LPVOID lpParameter) {
 		data->time[4] = ltime->tm_min;
 		data->time[5] = ltime->tm_sec;
 		// 更新抓包列表(主窗体)
-		pthis->updateTableView(data);
+		emit pthis->qs->labelSignal(data);
+
+		// 数据存入链表以用于后续调用
+		pthis->datalist.push_back(data);
 	}
 	emit pthis->qs->warningSignal("抓包线程已经结束");
 	return 1;
