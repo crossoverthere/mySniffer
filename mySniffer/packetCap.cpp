@@ -72,6 +72,12 @@ void PacketCapture::clearAllData() {
 }
 
 
+/* 从链表中取一个数据 */
+PKTDATA* PacketCapture::getData(int index) {
+	return datalist[index];
+}
+
+
 /* 抓包前相关配置 */
 int PacketCapture::initCapture(string& info) {
 	bpf_program fp;

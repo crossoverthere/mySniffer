@@ -62,7 +62,7 @@ typedef struct tcphdr {
 	unsigned short destPort;	// 目的端口地址
 	unsigned int seq;			// 序号
 	unsigned int ack_seq;		// 确认号
-
+	
 #if defined(LITTLE_ENDIAN)
 	unsigned short res1 : 4;
 	unsigned short doff : 4;
@@ -83,9 +83,10 @@ typedef struct tcphdr {
 	unsigned short ack : 1;
 	unsigned short psh : 1;
 	unsigned short rst : 1;
-	unsigned short sys : 1;
+	unsigned short syn : 1;
 	unsigned short fin : 1;
 #endif
+
 
 	unsigned short window;		// 窗口大小
 	unsigned short check;		// 校验和
@@ -115,8 +116,8 @@ typedef struct icmphdr {
 // IPv6
 typedef struct ip6hdr {
 	unsigned int version : 4;	// 版本
-	unsigned int flowType : 8;	// 流类型
-	unsigned int flowLabel : 20;// 流标签
+	unsigned int flowType : 4;	// 流类型
+	unsigned int flowLabel : 24;// 流标签
 
 	unsigned short plen;		// 有效载荷长度
 	unsigned char nh;			// 下一个报头

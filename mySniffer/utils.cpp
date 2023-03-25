@@ -98,7 +98,7 @@ int parsing_ip(const uchar* pkt, PKTDATA* data, PKTCOUNT* npkt) {
 	npkt->n_ip++;
 	// 解析上层协议
 	int len = iph->hdrLen * 4;
-	switch (iph->proto)
+	switch (data->iph->proto)
 	{
 	case PROTO_ICMP:
 		return parsing_icmp((uchar*)iph + len, data, npkt);
@@ -140,7 +140,7 @@ int parsing_ip6(const uchar* pkt, PKTDATA* data, PKTCOUNT* npkt) {
 
 	npkt->n_ip6++;
 	// 解析上层协议
-	switch (ip6h->nh)
+	switch (data->ip6h->nh)
 	{
 	case 0x3a:
 		return parsing_icmp6((uchar*)ip6h + 40, data, npkt);
@@ -218,8 +218,8 @@ int parsing_tcp(const uchar* pkt, PKTDATA* data, PKTCOUNT* npkt) {
 	// 复制信息
 	data->tcph->srcPort = ntohs(tcph->srcPort);
 	data->tcph->destPort = ntohs(tcph->destPort);
-	data->tcph->seq = tcph->seq;
-	data->tcph->ack_seq = tcph->ack_seq;
+	data->tcph->seq = ntohl(tcph->seq);
+	data->tcph->ack_seq = ntohl(tcph->ack_seq);
 	data->tcph->res1 = tcph->res1;
 	data->tcph->doff = tcph->doff;
 	data->tcph->fin = tcph->fin;

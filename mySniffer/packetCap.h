@@ -5,13 +5,13 @@
 
 #include <pcap.h>
 #include <string>
-#include <list>
 #include "qSignal.h"
 #include "protocol.h"
 #include "utils.h"
 
 typedef std::string string;
-typedef std::list<PKTDATA*> DataList;
+//typedef std::list<PKTDATA*> DataList;
+typedef std::vector<PKTDATA*> DataList;
 
 DWORD WINAPI captureThread(LPVOID lpParam);
 
@@ -46,6 +46,7 @@ public:
 	void setFlag(bool f);
 	int initCapture(string& info);		// 初始化
 	void clearAllData();				// 清空数据链表
+	PKTDATA* getData(int index);		// 从链表中取一个数据
 
 	friend DWORD WINAPI captureThread(LPVOID lpParam);
 };

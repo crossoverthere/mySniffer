@@ -117,9 +117,377 @@ void MainWidget::select_on_filterCmb() {
     this->packetCap->setFilter(filter.toStdString());
 }
 
+// 更新抓包信息
 void MainWidget::select_on_tableview(int row, int col) {
-    QString str = QString::number(row);
-    ui.label->setText(str + "success");
+    PKTDATA* data = packetCap->getData(row);
+    QTreeWidgetItem* topItem = NULL;
+    QTreeWidgetItem* twoLevelItem = NULL;
+    QString str;
+
+    // 更新抓包信息
+    ui.treeWidget->clear();
+    str = QString::asprintf("捕获的第%d个数据包", row + 1);
+    topItem = new QTreeWidgetItem(ui.treeWidget);
+    topItem->setText(0, str);
+
+    /* 链路层数据 */
+    str = "链路层数据";
+    topItem = new QTreeWidgetItem(ui.treeWidget);
+    topItem->setText(0, str);
+    str = "源MAC: " + ui.tableWidget->item(row, 4)->text();
+    twoLevelItem = new QTreeWidgetItem(topItem);
+    twoLevelItem->setText(0, str);
+    str = "目的MAC: " + ui.tableWidget->item(row, 5)->text();
+    twoLevelItem = new QTreeWidgetItem(topItem);
+    twoLevelItem->setText(0, str);
+    str = QString::asprintf("类型: 0x%04x", data->mach->type);
+    twoLevelItem = new QTreeWidgetItem(topItem);
+    twoLevelItem->setText(0, str);
+
+    /* 网络层数据 IP, ARP IPv6 */
+    switch (data->mach->type)
+    {
+    case 0x0806:
+        str = "ARP协议";
+        topItem = new QTreeWidgetItem(ui.treeWidget);
+        topItem->setText(0, str);
+        str = QString::asprintf("硬件类型: %d", data->arph->hrdType);
+        twoLevelItem = new QTreeWidgetItem(topItem);
+        twoLevelItem->setText(0, str);
+        str = QString::asprintf("协议类型: 0x%04x", data->arph->proType);
+        twoLevelItem = new QTreeWidgetItem(topItem);
+        twoLevelItem->setText(0, str);
+        str = QString::asprintf("硬件地址长度: %d", data->arph->hrdLen);
+        twoLevelItem = new QTreeWidgetItem(topItem);
+        twoLevelItem->setText(0, str);
+        str = QString::asprintf("协议地址长度: %d", data->arph->proLen);
+        twoLevelItem = new QTreeWidgetItem(topItem);
+        twoLevelItem->setText(0, str);
+        str = QString::asprintf("操作码: %d", data->arph->op);
+        twoLevelItem = new QTreeWidgetItem(topItem);
+        twoLevelItem->setText(0, str);
+        str = QString::asprintf("发送方MAC: %02X-%02X-%02X-%02X-%02X-%02X", data->arph->srcMAC[0],
+            data->arph->srcMAC[1], data->arph->srcMAC[2], data->arph->srcMAC[3], data->arph->srcMAC[4], data->arph->srcMAC[5]);
+        twoLevelItem = new QTreeWidgetItem(topItem);
+        twoLevelItem->setText(0, str);
+        str = QString::asprintf("发送方IP: %d.%d.%d.%d", data->arph->srcIP[0], 
+            data->arph->srcIP[1], data->arph->srcIP[2], data->arph->srcIP[3]);
+        twoLevelItem = new QTreeWidgetItem(topItem);
+        twoLevelItem->setText(0, str);
+        str = QString::asprintf("接收方MAC: %02X-%02X-%02X-%02X-%02X-%02X", data->arph->destMAC[0],
+            data->arph->destMAC[1], data->arph->destMAC[2], data->arph->destMAC[3], data->arph->destMAC[4], data->arph->destMAC[5]);
+        twoLevelItem = new QTreeWidgetItem(topItem);
+        twoLevelItem->setText(0, str);
+        str = QString::asprintf("接收方IP: %d.%d.%d.%d", data->arph->destIP[0],
+            data->arph->destIP[1], data->arph->destIP[2], data->arph->destIP[3]);
+        twoLevelItem = new QTreeWidgetItem(topItem);
+        twoLevelItem->setText(0, str);
+        break;
+
+    case 0x0800:
+        str = "IP协议";
+        topItem = new QTreeWidgetItem(ui.treeWidget);
+        topItem->setText(0, str);
+        str = QString::asprintf("版本: %d", data->iph->version);
+        twoLevelItem = new QTreeWidgetItem(topItem);
+        twoLevelItem->setText(0, str);
+        str = QString::asprintf("报头长度: %dbyte", data->iph->hdrLen * 4);
+        twoLevelItem = new QTreeWidgetItem(topItem);
+        twoLevelItem->setText(0, str);
+        str = QString::asprintf("服务类型: %d", data->iph->tos);
+        twoLevelItem = new QTreeWidgetItem(topItem);
+        twoLevelItem->setText(0, str);
+        str = QString::asprintf("总长度: %d", data->iph->tLen);
+        twoLevelItem = new QTreeWidgetItem(topItem);
+        twoLevelItem->setText(0, str);
+        str = QString::asprintf("标识: 0x%04x", data->iph->id);
+        twoLevelItem = new QTreeWidgetItem(topItem);
+        twoLevelItem->setText(0, str);
+        // 需要重写
+        str = QString::asprintf("段偏移: %d", data->iph->flag_off);
+        twoLevelItem = new QTreeWidgetItem(topItem);
+        twoLevelItem->setText(0, str);
+        str = QString::asprintf("生存期: %d", data->iph->ttl);
+        twoLevelItem = new QTreeWidgetItem(topItem);
+        twoLevelItem->setText(0, str);
+        str = QString::asprintf("协议: %d", data->iph->proto);
+        twoLevelItem = new QTreeWidgetItem(topItem);
+        twoLevelItem->setText(0, str);
+        str = QString::asprintf("首部校验和: 0x%02x", data->iph->check);
+        twoLevelItem = new QTreeWidgetItem(topItem);
+        twoLevelItem->setText(0, str);
+        str = "源IP: " + ui.tableWidget->item(row, 6)->text();
+        twoLevelItem = new QTreeWidgetItem(topItem);
+        twoLevelItem->setText(0, str);
+        str = "目的IP" + ui.tableWidget->item(row, 7)->text();
+        twoLevelItem = new QTreeWidgetItem(topItem);
+        twoLevelItem->setText(0, str);
+
+        /* 处理传输层 ICMP TCP UDP */
+        switch (data->iph->proto)
+        {
+        case 1:
+            str = "ICMP协议";
+            topItem = new QTreeWidgetItem(ui.treeWidget);
+            topItem->setText(0, str);
+            str = QString::asprintf("类型: %d", data->icmph->type);
+            twoLevelItem = new QTreeWidgetItem(topItem);
+            twoLevelItem->setText(0, str);
+            str = QString::asprintf("代码: %d", data->icmph->code);
+            twoLevelItem = new QTreeWidgetItem(topItem);
+            twoLevelItem->setText(0, str);
+            str = QString::asprintf("序号: %d", data->icmph->seq);
+            twoLevelItem = new QTreeWidgetItem(topItem);
+            twoLevelItem->setText(0, str);
+            str = QString::asprintf("校验和: %d", data->icmph->check);
+            twoLevelItem = new QTreeWidgetItem(topItem);
+            twoLevelItem->setText(0, str);
+            break;
+
+        case 6:
+            str = "TCP协议";
+            topItem = new QTreeWidgetItem(ui.treeWidget);
+            topItem->setText(0, str);
+            str = QString::asprintf("源端口: %d", data->tcph->srcPort);
+            twoLevelItem = new QTreeWidgetItem(topItem);
+            twoLevelItem->setText(0, str);
+            str = QString::asprintf("目的端口: %d", data->tcph->destPort);
+            twoLevelItem = new QTreeWidgetItem(topItem);
+            twoLevelItem->setText(0, str);
+            str = QString::asprintf("序号: %u", data->tcph->seq);
+            twoLevelItem = new QTreeWidgetItem(topItem);
+            twoLevelItem->setText(0, str);
+            str = QString::asprintf("确认号: %u", data->tcph->ack_seq);
+            twoLevelItem = new QTreeWidgetItem(topItem);
+            twoLevelItem->setText(0, str);
+            // mark,重写
+            str = QString::asprintf("首部长度: %dbyte", data->tcph->doff * 4);
+            twoLevelItem = new QTreeWidgetItem(topItem);
+            twoLevelItem->setText(0, str);
+            str = QString::asprintf("保留位: %d", data->tcph->res1);
+            twoLevelItem = new QTreeWidgetItem(topItem);
+            twoLevelItem->setText(0, str);
+            str = QString::asprintf("URG: %d", data->tcph->urg);
+            twoLevelItem = new QTreeWidgetItem(topItem);
+            twoLevelItem->setText(0, str);
+            str = QString::asprintf("ACK: %d", data->tcph->ack);
+            twoLevelItem = new QTreeWidgetItem(topItem);
+            twoLevelItem->setText(0, str);
+            str = QString::asprintf("PSH: %d", data->tcph->psh);
+            twoLevelItem = new QTreeWidgetItem(topItem);
+            twoLevelItem->setText(0, str);
+            str = QString::asprintf("RST: %d", data->tcph->rst);
+            twoLevelItem = new QTreeWidgetItem(topItem);
+            twoLevelItem->setText(0, str);
+            str = QString::asprintf("SYN: %d", data->tcph->syn);
+            twoLevelItem = new QTreeWidgetItem(topItem);
+            twoLevelItem->setText(0, str);
+            str = QString::asprintf("FIN: %d", data->tcph->fin);
+            twoLevelItem = new QTreeWidgetItem(topItem);
+            twoLevelItem->setText(0, str);
+            str = QString::asprintf("窗口大小: %d", data->tcph->window);
+            twoLevelItem = new QTreeWidgetItem(topItem);
+            twoLevelItem->setText(0, str);
+            str = QString::asprintf("校验和: %d", data->tcph->check);
+            twoLevelItem = new QTreeWidgetItem(topItem);
+            twoLevelItem->setText(0, str);
+            str = QString::asprintf("紧急指针: %d", data->tcph->urgPtr);
+            twoLevelItem = new QTreeWidgetItem(topItem);
+            twoLevelItem->setText(0, str);
+            break;
+
+        case 17:
+            str = "UDP协议";
+            topItem = new QTreeWidgetItem(ui.treeWidget);
+            topItem->setText(0, str);
+            str = QString::asprintf("源端口: %d", data->udph->srcPort);
+            twoLevelItem = new QTreeWidgetItem(topItem);
+            twoLevelItem->setText(0, str);
+            str = QString::asprintf("目的端口: %d", data->udph->destPort);
+            twoLevelItem = new QTreeWidgetItem(topItem);
+            twoLevelItem->setText(0, str);
+            str = QString::asprintf("总长度: %d", data->udph->len);
+            twoLevelItem = new QTreeWidgetItem(topItem);
+            twoLevelItem->setText(0, str);
+            str = QString::asprintf("校验和: %d", data->udph->check);
+            twoLevelItem = new QTreeWidgetItem(topItem);
+            twoLevelItem->setText(0, str);
+            break;
+
+        default:
+            break;
+        }
+        break;
+
+    case 0x86dd:
+        str = "IPv6协议";
+        topItem = new QTreeWidgetItem(ui.treeWidget);
+        topItem->setText(0, str);
+        // 此处大小端未对齐
+         // 需修改
+        str = QString::asprintf("版本: %d", data->ip6h->version);
+        twoLevelItem = new QTreeWidgetItem(topItem);
+        twoLevelItem->setText(0, str);
+        str = QString::asprintf("流类型: %d", data->ip6h->flowType);
+        twoLevelItem = new QTreeWidgetItem(topItem);
+        twoLevelItem->setText(0, str);
+        str = QString::asprintf("流标签: %d", data->ip6h->flowLabel);
+        twoLevelItem = new QTreeWidgetItem(topItem);
+        twoLevelItem->setText(0, str);
+        str = QString::asprintf("有效载荷长度: %d", data->ip6h->plen);
+        twoLevelItem = new QTreeWidgetItem(topItem);
+        twoLevelItem->setText(0, str);
+        str = QString::asprintf("下一个报头: 0x%02x", data->ip6h->nh);
+        twoLevelItem = new QTreeWidgetItem(topItem);
+        twoLevelItem->setText(0, str);
+        str = QString::asprintf("跳跃限制: %d", data->ip6h->hlim);
+        twoLevelItem = new QTreeWidgetItem(topItem);
+        twoLevelItem->setText(0, str);
+        str = "源IP: " + ui.tableWidget->item(row, 6)->text();
+        twoLevelItem = new QTreeWidgetItem(topItem);
+        twoLevelItem->setText(0, str);
+        str = "目的IP" + ui.tableWidget->item(row, 7)->text();
+        twoLevelItem = new QTreeWidgetItem(topItem);
+        twoLevelItem->setText(0, str);
+
+        /* 处理传输层 ICMP TCP UDP */
+        switch (data->ip6h->nh)
+        {
+        case 0x3a:
+            str = "ICMPv6协议";
+            topItem = new QTreeWidgetItem(ui.treeWidget);
+            topItem->setText(0, str);
+            str = QString::asprintf("类型: %d", data->icmp6h->type);
+            twoLevelItem = new QTreeWidgetItem(topItem);
+            twoLevelItem->setText(0, str);
+            str = QString::asprintf("代码: %d", data->icmp6h->code);
+            twoLevelItem = new QTreeWidgetItem(topItem);
+            twoLevelItem->setText(0, str);
+            str = QString::asprintf("序号: %d", data->icmp6h->seq);
+            twoLevelItem = new QTreeWidgetItem(topItem);
+            twoLevelItem->setText(0, str);
+            str = QString::asprintf("校验和: %d", data->icmp6h->chksum);
+            twoLevelItem = new QTreeWidgetItem(topItem);
+            twoLevelItem->setText(0, str);
+            str = QString::asprintf("选项-类型: %d", data->icmp6h->op_type);
+            twoLevelItem = new QTreeWidgetItem(topItem);
+            twoLevelItem->setText(0, str);
+            str = QString::asprintf("选项-长度: %d", data->icmp6h->op_len);
+            twoLevelItem = new QTreeWidgetItem(topItem);
+            twoLevelItem->setText(0, str);
+            str = QString::asprintf("选项-链路层地址: %02X-%02X-%02X-%02X-%02X-%02X", data->icmp6h->op_ethaddr[0], data->icmp6h->op_ethaddr[1], 
+                data->icmp6h->op_ethaddr[2], data->icmp6h->op_ethaddr[3], data->icmp6h->op_ethaddr[4], data->icmp6h->op_ethaddr[5]);
+            twoLevelItem = new QTreeWidgetItem(topItem);
+            twoLevelItem->setText(0, str);
+            break;
+
+        case 0x06:
+            str = "TCP协议";
+            topItem = new QTreeWidgetItem(ui.treeWidget);
+            topItem->setText(0, str);
+            str = QString::asprintf("源端口: %d", data->tcph->srcPort);
+            twoLevelItem = new QTreeWidgetItem(topItem);
+            twoLevelItem->setText(0, str);
+            str = QString::asprintf("目的端口: %d", data->tcph->destPort);
+            twoLevelItem = new QTreeWidgetItem(topItem);
+            twoLevelItem->setText(0, str);
+            str = QString::asprintf("序号: %u", data->tcph->seq);
+            twoLevelItem = new QTreeWidgetItem(topItem);
+            twoLevelItem->setText(0, str);
+            str = QString::asprintf("确认号: %u", data->tcph->ack_seq);
+            twoLevelItem = new QTreeWidgetItem(topItem);
+            twoLevelItem->setText(0, str);
+            // mark,重写
+            str = QString::asprintf("首部长度: %dbyte", data->tcph->doff * 4);
+            twoLevelItem = new QTreeWidgetItem(topItem);
+            twoLevelItem->setText(0, str);
+            str = QString::asprintf("保留位: %d", data->tcph->res1);
+            twoLevelItem = new QTreeWidgetItem(topItem);
+            twoLevelItem->setText(0, str);
+            str = QString::asprintf("URG: %d", data->tcph->urg);
+            twoLevelItem = new QTreeWidgetItem(topItem);
+            twoLevelItem->setText(0, str);
+            str = QString::asprintf("ACK: %d", data->tcph->ack);
+            twoLevelItem = new QTreeWidgetItem(topItem);
+            twoLevelItem->setText(0, str);
+            str = QString::asprintf("PSH: %d", data->tcph->psh);
+            twoLevelItem = new QTreeWidgetItem(topItem);
+            twoLevelItem->setText(0, str);
+            str = QString::asprintf("RST: %d", data->tcph->rst);
+            twoLevelItem = new QTreeWidgetItem(topItem);
+            twoLevelItem->setText(0, str);
+            str = QString::asprintf("SYN: %d", data->tcph->syn);
+            twoLevelItem = new QTreeWidgetItem(topItem);
+            twoLevelItem->setText(0, str);
+            str = QString::asprintf("FIN: %d", data->tcph->fin);
+            twoLevelItem = new QTreeWidgetItem(topItem);
+            twoLevelItem->setText(0, str);
+            str = QString::asprintf("窗口大小: %d", data->tcph->window);
+            twoLevelItem = new QTreeWidgetItem(topItem);
+            twoLevelItem->setText(0, str);
+            str = QString::asprintf("校验和: %d", data->tcph->check);
+            twoLevelItem = new QTreeWidgetItem(topItem);
+            twoLevelItem->setText(0, str);
+            str = QString::asprintf("紧急指针: %d", data->tcph->urgPtr);
+            twoLevelItem = new QTreeWidgetItem(topItem);
+            twoLevelItem->setText(0, str);
+            break;
+
+        case 0x11:
+            str = "UDP协议";
+            topItem = new QTreeWidgetItem(ui.treeWidget);
+            topItem->setText(0, str);
+            str = QString::asprintf("源端口: %d", data->udph->srcPort);
+            twoLevelItem = new QTreeWidgetItem(topItem);
+            twoLevelItem->setText(0, str);
+            str = QString::asprintf("目的端口: %d", data->udph->destPort);
+            twoLevelItem = new QTreeWidgetItem(topItem);
+            twoLevelItem->setText(0, str);
+            str = QString::asprintf("总长度: %d", data->udph->len);
+            twoLevelItem = new QTreeWidgetItem(topItem);
+            twoLevelItem->setText(0, str);
+            str = QString::asprintf("校验和: %d", data->udph->check);
+            twoLevelItem = new QTreeWidgetItem(topItem);
+            twoLevelItem->setText(0, str);
+            break;
+
+        default:
+            break;
+        }
+        break;
+
+    default:
+        break;
+    }
+    //ui.treeWidget->expandAll();
+
+    // 对数据格式化显示
+    ui.textEdit->clear();
+    unsigned char* pkt = (unsigned char* )data;
+    int size = data->len;
+    unsigned int i = 0;
+    int rowcount = 0;
+    unsigned char ch;
+    for (i; i < size; i+=16) {
+        // 显示地址
+        ui.textEdit->append(QString::asprintf("%04x:   ", i));
+        // 显示16进制数据
+        rowcount = (size - i) > 16 ? 16 : (size - i);
+        for (int j = 0; j < rowcount; j++) {
+            ui.textEdit->insertPlainText(QString::asprintf("%02x  ", pkt[i + j]));
+        }
+        if (rowcount < 16) {
+            for (int j = rowcount; j < 16; j++) {
+                ui.textEdit->insertPlainText("    ");
+            }
+        }
+        // 显示字符数据
+        for (int j = 0; j < rowcount; j++) {
+            ch = pkt[i + j];
+            ch = isprint(ch) ? ch : '.';
+            ui.textEdit->insertPlainText(QString::asprintf("%c", ch));
+        }
+    }
 }
 
 // 接收后端信号，并作出响应
