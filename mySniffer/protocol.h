@@ -163,6 +163,7 @@ struct PKTDATA{
 	char pktType[8];			// 包类型
 	int time[6];				// 时间
 	int len;					// 长度
+	unsigned char* pktData;
 
 	MAC_HEADER* mach;			// MAC帧头
 	ARP_HEADER* arph;			// ARP报头
@@ -178,7 +179,9 @@ struct PKTDATA{
 
 	void* apph;					//应用层报头
 
+
 	void freePtr() {
+		free(pktData);
 		free(mach);
 		free(arph);
 		free(iph);

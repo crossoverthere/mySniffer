@@ -463,7 +463,7 @@ void MainWidget::select_on_tableview(int row, int col) {
 
     // 对数据格式化显示
     ui.textEdit->clear();
-    unsigned char* pkt = (unsigned char* )data;
+    unsigned char* pkt = data->pktData;
     int size = data->len;
     unsigned int i = 0;
     int rowcount = 0;

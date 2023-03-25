@@ -181,6 +181,11 @@ DWORD WINAPI captureThread(LPVOID lpParameter) {
 		}
 
 		// 保存数据包信息
+		data->pktData = (uchar*)malloc(pktHeader->len);
+		if (data->pktData == NULL) {
+			return -1;
+		}
+		memcpy(data->pktData, pktData, pktHeader->len);
 
 
 		// 更新抓包统计(主窗体)

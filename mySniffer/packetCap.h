@@ -10,7 +10,6 @@
 #include "utils.h"
 
 typedef std::string string;
-//typedef std::list<PKTDATA*> DataList;
 typedef std::vector<PKTDATA*> DataList;
 
 DWORD WINAPI captureThread(LPVOID lpParam);
