@@ -156,6 +156,7 @@ struct PKTCOUNT {
 	int n_icmp;
 	int n_icmp6;
 	int n_http;
+	//int n_https;
 	int n_other;
 	int n_sum ;
 
@@ -184,7 +185,7 @@ struct PKTDATA{
 	TCP_HEADER* tcph;			// TCP报头
 	UDP_HEADER* udph;			// UDP报头
 
-	void* apph;					//应用层报头
+	//void* apph;					//应用层报头
 
 
 	void freePtr() {
@@ -197,6 +198,6 @@ struct PKTDATA{
 		free(icmp6h);
 		free(tcph);
 		free(udph);
-		free(apph);
+	//	free(apph);
 	}
 };

@@ -233,15 +233,18 @@ int parsing_tcp(const uchar* pkt, PKTDATA* data, PKTCOUNT* npkt) {
 	data->tcph->urgPtr = ntohs(tcph->urgPtr);
 	data->tcph->option = ntohs(tcph->option);
 
+	npkt->n_tcp++;
 	// http分支
 	if (ntohs(tcph->destPort) == 80 || ntohs(tcph->srcPort) == 80) {
 		strcpy(data->pktType, "HTTP");
 		npkt->n_http++;
 	}
+	else if (data->tcph->destPort == 443 || data->tcph->srcPort == 443) {
+		strcpy(data->pktType, "TLS");
+	}
 	else
 	{
 		strcpy(data->pktType, "TCP");
-		npkt->n_tcp++;
 	}
 	return 1;
 }

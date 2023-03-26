@@ -27,6 +27,9 @@
   </property>
   <widget class="QWidget" name="centralWidget">
    <widget class="QTableWidget" name="tableWidget">
+    <property name="enabled">
+     <bool>true</bool>
+    </property>
     <property name="geometry">
      <rect>
       <x>20</x>
@@ -79,9 +82,9 @@
    <widget class="QGroupBox" name="horizontalGroupBox">
     <property name="geometry">
      <rect>
-      <x>80</x>
+      <x>20</x>
       <y>10</y>
-      <width>961</width>
+      <width>1080</width>
       <height>60</height>
      </rect>
     </property>
@@ -179,6 +182,26 @@
        </item>
        <item>
         <property name="text">
+         <string>ARP</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>IP</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>IP6</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>ICMP</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
          <string>TCP</string>
         </property>
        </item>
@@ -189,17 +212,12 @@
        </item>
        <item>
         <property name="text">
-         <string>IP</string>
+         <string>TLS</string>
         </property>
        </item>
        <item>
         <property name="text">
-         <string>ICMP</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>ARP</string>
+         <string>HTTP</string>
         </property>
        </item>
       </widget>
@@ -233,6 +251,16 @@
        </property>
       </widget>
      </item>
+     <item>
+      <widget class="QPushButton" name="Btn_trace">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
+       <property name="text">
+        <string>追踪TCP</string>
+       </property>
+      </widget>
+     </item>
     </layout>
     <zorder>Btn_cap</zorder>
     <zorder>label_net</zorder>
@@ -240,6 +268,7 @@
     <zorder>label_filter</zorder>
     <zorder>comboBox_filter</zorder>
     <zorder>Btn_uncap</zorder>
+    <zorder>Btn_trace</zorder>
    </widget>
    <widget class="QGroupBox" name="groupBox">
     <property name="geometry">
@@ -254,6 +283,9 @@
      <string>报文分析</string>
     </property>
     <widget class="QTreeWidget" name="treeWidget">
+     <property name="enabled">
+      <bool>true</bool>
+     </property>
      <property name="geometry">
       <rect>
        <x>10</x>
@@ -288,7 +320,7 @@
      <rect>
       <x>280</x>
       <y>310</y>
-      <width>561</width>
+      <width>570</width>
       <height>310</height>
      </rect>
     </property>
@@ -296,11 +328,14 @@
      <string>报文数据</string>
     </property>
     <widget class="QPlainTextEdit" name="plainTextEdit">
+     <property name="enabled">
+      <bool>true</bool>
+     </property>
      <property name="geometry">
       <rect>
        <x>10</x>
        <y>20</y>
-       <width>540</width>
+       <width>550</width>
        <height>280</height>
       </rect>
      </property>
@@ -310,11 +345,14 @@
     </widget>
    </widget>
    <widget class="QGroupBox" name="groupBox_3">
+    <property name="enabled">
+     <bool>true</bool>
+    </property>
     <property name="geometry">
      <rect>
-      <x>849</x>
+      <x>859</x>
       <y>310</y>
-      <width>251</width>
+      <width>241</width>
       <height>310</height>
      </rect>
     </property>
@@ -326,7 +364,7 @@
       <rect>
        <x>0</x>
        <y>30</y>
-       <width>60</width>
+       <width>50</width>
        <height>20</height>
       </rect>
      </property>
@@ -346,7 +384,7 @@
     <widget class="QLabel" name="label_2">
      <property name="geometry">
       <rect>
-       <x>130</x>
+       <x>120</x>
        <y>30</y>
        <width>60</width>
        <height>20</height>
@@ -369,7 +407,7 @@
       <rect>
        <x>0</x>
        <y>80</y>
-       <width>60</width>
+       <width>50</width>
        <height>20</height>
       </rect>
      </property>
@@ -388,7 +426,7 @@
     <widget class="QLabel" name="label_4">
      <property name="geometry">
       <rect>
-       <x>130</x>
+       <x>120</x>
        <y>80</y>
        <width>60</width>
        <height>20</height>
@@ -411,7 +449,7 @@
       <rect>
        <x>0</x>
        <y>130</y>
-       <width>60</width>
+       <width>50</width>
        <height>20</height>
       </rect>
      </property>
@@ -431,7 +469,7 @@
     <widget class="QLabel" name="label_6">
      <property name="geometry">
       <rect>
-       <x>130</x>
+       <x>120</x>
        <y>130</y>
        <width>60</width>
        <height>20</height>
@@ -455,7 +493,7 @@
       <rect>
        <x>0</x>
        <y>180</y>
-       <width>60</width>
+       <width>50</width>
        <height>20</height>
       </rect>
      </property>
@@ -475,7 +513,7 @@
     <widget class="QLabel" name="label_8">
      <property name="geometry">
       <rect>
-       <x>130</x>
+       <x>120</x>
        <y>180</y>
        <width>60</width>
        <height>20</height>
@@ -494,32 +532,10 @@
       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
      </property>
     </widget>
-    <widget class="QLabel" name="label_9">
-     <property name="geometry">
-      <rect>
-       <x>0</x>
-       <y>230</y>
-       <width>60</width>
-       <height>20</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <pointsize>12</pointsize>
-       <underline>false</underline>
-      </font>
-     </property>
-     <property name="text">
-      <string>总和</string>
-     </property>
-     <property name="alignment">
-      <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-     </property>
-    </widget>
     <widget class="QLabel" name="label_10">
      <property name="geometry">
       <rect>
-       <x>130</x>
+       <x>120</x>
        <y>230</y>
        <width>60</width>
        <height>20</height>
@@ -544,7 +560,7 @@
      </property>
      <property name="geometry">
       <rect>
-       <x>70</x>
+       <x>60</x>
        <y>25</y>
        <width>50</width>
        <height>30</height>
@@ -572,7 +588,7 @@
      </property>
      <property name="geometry">
       <rect>
-       <x>200</x>
+       <x>190</x>
        <y>25</y>
        <width>50</width>
        <height>30</height>
@@ -597,7 +613,7 @@
      </property>
      <property name="geometry">
       <rect>
-       <x>70</x>
+       <x>60</x>
        <y>75</y>
        <width>50</width>
        <height>30</height>
@@ -622,7 +638,7 @@
      </property>
      <property name="geometry">
       <rect>
-       <x>200</x>
+       <x>190</x>
        <y>75</y>
        <width>50</width>
        <height>30</height>
@@ -647,7 +663,7 @@
      </property>
      <property name="geometry">
       <rect>
-       <x>70</x>
+       <x>60</x>
        <y>125</y>
        <width>50</width>
        <height>30</height>
@@ -672,7 +688,7 @@
      </property>
      <property name="geometry">
       <rect>
-       <x>200</x>
+       <x>190</x>
        <y>125</y>
        <width>50</width>
        <height>30</height>
@@ -697,7 +713,7 @@
      </property>
      <property name="geometry">
       <rect>
-       <x>70</x>
+       <x>60</x>
        <y>175</y>
        <width>50</width>
        <height>30</height>
@@ -722,7 +738,7 @@
      </property>
      <property name="geometry">
       <rect>
-       <x>200</x>
+       <x>190</x>
        <y>175</y>
        <width>50</width>
        <height>30</height>
@@ -747,7 +763,7 @@
      </property>
      <property name="geometry">
       <rect>
-       <x>70</x>
+       <x>60</x>
        <y>225</y>
        <width>50</width>
        <height>30</height>
@@ -772,7 +788,7 @@
      </property>
      <property name="geometry">
       <rect>
-       <x>200</x>
+       <x>190</x>
        <y>225</y>
        <width>50</width>
        <height>30</height>
@@ -789,6 +805,27 @@
      </property>
      <property name="alignment">
       <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_11">
+     <property name="geometry">
+      <rect>
+       <x>0</x>
+       <y>230</y>
+       <width>50</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>12</pointsize>
+      </font>
+     </property>
+     <property name="text">
+      <string>总和</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
      </property>
     </widget>
    </widget>
@@ -811,19 +848,16 @@
     <property name="title">
      <string>文件(F)</string>
     </property>
-    <addaction name="actionNew"/>
     <addaction name="actionOpen"/>
     <addaction name="actionExit"/>
-   </widget>
-   <widget class="QMenu" name="menu_edit">
-    <property name="title">
-     <string>编辑(E)</string>
-    </property>
    </widget>
    <widget class="QMenu" name="menu_capture">
     <property name="title">
      <string>捕获(C)</string>
     </property>
+    <addaction name="actionCap"/>
+    <addaction name="actionUCap"/>
+    <addaction name="actionSetfilter"/>
    </widget>
    <widget class="QMenu" name="menu_help">
     <property name="title">
@@ -831,7 +865,6 @@
     </property>
    </widget>
    <addaction name="menu_file"/>
-   <addaction name="menu_edit"/>
    <addaction name="menu_capture"/>
    <addaction name="menu_help"/>
   </widget>
@@ -849,6 +882,21 @@
   <action name="actionExit">
    <property name="text">
     <string>退出</string>
+   </property>
+  </action>
+  <action name="actionCap">
+   <property name="text">
+    <string>开始捕获</string>
+   </property>
+  </action>
+  <action name="actionUCap">
+   <property name="text">
+    <string>结束捕获</string>
+   </property>
+  </action>
+  <action name="actionSetfilter">
+   <property name="text">
+    <string>设置过滤器</string>
    </property>
   </action>
  </widget>
@@ -880,7 +928,7 @@
    <slot>click_on_capBtn()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>945</x>
+     <x>919</x>
      <y>73</y>
     </hint>
     <hint type="destinationlabel">
@@ -896,7 +944,7 @@
    <slot>click_on_uncapBtn()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>1030</x>
+     <x>1004</x>
      <y>73</y>
     </hint>
     <hint type="destinationlabel">
@@ -928,7 +976,7 @@
    <slot>select_on_filterCmb()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>860</x>
+     <x>834</x>
      <y>71</y>
     </hint>
     <hint type="destinationlabel">
@@ -953,6 +1001,22 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>Btn_trace</sender>
+   <signal>clicked()</signal>
+   <receiver>mySnifferClass</receiver>
+   <slot>click_on_traceBtn()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>1064</x>
+     <y>67</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>1056</x>
+     <y>98</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>click_on_capBtn()</slot>
@@ -960,5 +1024,6 @@
   <slot>select_on_netCmb()</slot>
   <slot>select_on_filterCmb()</slot>
   <slot>select_on_tableview(int,int)</slot>
+  <slot>click_on_traceBtn()</slot>
  </slots>
 </ui>

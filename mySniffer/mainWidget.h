@@ -28,6 +28,7 @@ private slots:
     void select_on_netCmb();
     void select_on_filterCmb();
     void select_on_tableview(int row, int col);
+    void click_on_traceBtn();
 
     /* 由后端触发 */
     void update_on_tableview(PKTDATA* data);        // 更新表格信息

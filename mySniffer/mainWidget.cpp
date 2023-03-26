@@ -83,6 +83,7 @@ void MainWidget::click_on_capBtn() {
     else {
         ui.Btn_cap->setEnabled(false);
         ui.Btn_uncap->setEnabled(true);
+        ui.Btn_trace->setEnabled(false);
         ui.comboBox_net->setEnabled(false);
         ui.comboBox_filter->setEnabled(false);
     }
@@ -94,6 +95,7 @@ void MainWidget::click_on_uncapBtn() {
     ui.Btn_cap->setText("重新开始");
 
     ui.Btn_uncap->setEnabled(false);
+    ui.Btn_trace->setEnabled(true);
     ui.comboBox_net->setEnabled(true);
     ui.comboBox_filter->setEnabled(true);
 }
@@ -109,6 +111,12 @@ void MainWidget::select_on_filterCmb() {
     if (ui.comboBox_filter->currentIndex() == 0) {
         filter = "";
     }
+    else if (ui.comboBox_filter->currentIndex() == 8) {
+        filter = "tcp port 80";
+    }
+    else if (ui.comboBox_filter->currentIndex() == 7) {
+        filter = "tcp port 443";
+    }
     else {
         filter = ui.comboBox_filter->currentText();
     }
@@ -116,6 +124,59 @@ void MainWidget::select_on_filterCmb() {
     // 根据当前项设置过滤规则
     this->packetCap->setFilter(filter.toStdString());
 }
+
+
+// TCP流追踪
+void MainWidget::click_on_traceBtn() {
+    int row = ui.tableWidget->currentRow();
+    if (row < 0) {
+        sendWarning("未选择TCP包");
+        return;
+    }
+    PKTDATA* data = packetCap->getData(row);
+    QString srcIP = ui.tableWidget->item(row, 6)->text();
+    QString destIP = ui.tableWidget->item(row, 7)->text();
+    QString src;
+    QString dest;
+    unsigned char ch;
+    int rowcount = ui.tableWidget->rowCount();
+    if (data->tcph == NULL) {
+        sendWarning("无法追踪非TCP包");
+        return;
+    }
+
+    // 申请一个进度条窗口
+    QProgressDialog* progressDlg = new QProgressDialog(this);
+    progressDlg->setWindowModality(Qt::WindowModal);
+    progressDlg->setMinimumDuration(0);
+    progressDlg->setWindowTitle("Please Wait");
+    progressDlg->setLabelText("Loading...");
+    progressDlg->setCancelButtonText(nullptr);
+    progressDlg->setRange(0, rowcount);
+
+    // 追踪数据
+    for (int i = 0; i < rowcount; i++) {
+        src = ui.tableWidget->item(i, 6)->text();
+        dest = ui.tableWidget->item(i, 7)->text();
+        if ((src == srcIP) && (dest == destIP)) {
+            for (int j = 0; j < 8; j++) {
+                ui.tableWidget->item(i, j)->setBackground(QColor(RGB(194, 195, 252)));
+            }
+        }else if ((src == destIP) && (dest == srcIP)) {
+            for (int j = 0; j < 8; j++) {
+                ui.tableWidget->item(i, j)->setBackground(QColor(RGB(230, 230, 230)));
+            }
+        }
+        else {
+            for (int j = 0; j < 8; j++) {
+                ui.tableWidget->item(i, j)->setBackground(QColor(RGB(255, 255, 255)));
+            }
+        }
+        progressDlg->setValue(i);
+    }
+    progressDlg->setValue(rowcount);
+}
+
 
 // 更新抓包信息
 void MainWidget::select_on_tableview(int row, int col) {
@@ -475,7 +536,6 @@ void MainWidget::select_on_tableview(int row, int col) {
     progressDlg->setLabelText("Loading...");
     progressDlg->setCancelButtonText(nullptr);
     progressDlg->setRange(0, size);
-
     for (i; i < size; i+=16) {
         // 显示地址
         ui.plainTextEdit->appendPlainText(QString::asprintf("%04x:\t\t", i));
@@ -579,6 +639,7 @@ void MainWidget::updata_stats(PKTCOUNT* npkt) {
     ui.lEdit_nhttp->setText(QString::number(npkt->n_http));
     ui.lEdit_nicmp->setText(QString::number(npkt->n_icmp));
     ui.lEdit_nicmp6->setText(QString::number(npkt->n_icmp6));
+    //ui.lEdit_nhttps->setText(QString::number(npkt->n_https));
     ui.lEdit_sum->setText(QString::number(npkt->n_sum));
     ui.lEdit_other->setText(QString::number(npkt->n_other));
 }
