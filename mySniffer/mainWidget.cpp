@@ -122,6 +122,7 @@ void MainWidget::select_on_tableview(int row, int col) {
     PKTDATA* data = packetCap->getData(row);
     QTreeWidgetItem* topItem = NULL;
     QTreeWidgetItem* twoLevelItem = NULL;
+    QTreeWidgetItem* thrLevelItem = NULL;
     QString str;
 
     // 更新抓包信息
@@ -157,13 +158,13 @@ void MainWidget::select_on_tableview(int row, int col) {
         str = QString::asprintf("协议类型: 0x%04x", data->arph->proType);
         twoLevelItem = new QTreeWidgetItem(topItem);
         twoLevelItem->setText(0, str);
-        str = QString::asprintf("硬件地址长度: %d", data->arph->hrdLen);
+        str = QString::asprintf("硬件地址长度: %dbyte", data->arph->hrdLen);
         twoLevelItem = new QTreeWidgetItem(topItem);
         twoLevelItem->setText(0, str);
-        str = QString::asprintf("协议地址长度: %d", data->arph->proLen);
+        str = QString::asprintf("协议地址长度: %dbyte", data->arph->proLen);
         twoLevelItem = new QTreeWidgetItem(topItem);
         twoLevelItem->setText(0, str);
-        str = QString::asprintf("操作码: %d", data->arph->op);
+        str = QString::asprintf("操作类型: %d", data->arph->op);
         twoLevelItem = new QTreeWidgetItem(topItem);
         twoLevelItem->setText(0, str);
         str = QString::asprintf("发送方MAC: %02X-%02X-%02X-%02X-%02X-%02X", data->arph->srcMAC[0],
@@ -188,23 +189,31 @@ void MainWidget::select_on_tableview(int row, int col) {
         str = "IP协议";
         topItem = new QTreeWidgetItem(ui.treeWidget);
         topItem->setText(0, str);
-        str = QString::asprintf("版本: %d", data->iph->version);
+        str = QString::asprintf("版本号: %d", data->iph->version);
         twoLevelItem = new QTreeWidgetItem(topItem);
         twoLevelItem->setText(0, str);
-        str = QString::asprintf("报头长度: %dbyte", data->iph->hdrLen * 4);
+        str = QString::asprintf("报头长度: %d=%dbyte", data->iph->hdrLen, data->iph->hdrLen * 4);
         twoLevelItem = new QTreeWidgetItem(topItem);
         twoLevelItem->setText(0, str);
-        str = QString::asprintf("服务类型: %d", data->iph->tos);
+        str = QString::asprintf("服务类型: 0x%02x", data->iph->tos);
         twoLevelItem = new QTreeWidgetItem(topItem);
         twoLevelItem->setText(0, str);
-        str = QString::asprintf("总长度: %d", data->iph->tLen);
+        str = QString::asprintf("IP包总长: %dbyte", data->iph->tLen);
         twoLevelItem = new QTreeWidgetItem(topItem);
         twoLevelItem->setText(0, str);
         str = QString::asprintf("标识: 0x%04x", data->iph->id);
         twoLevelItem = new QTreeWidgetItem(topItem);
         twoLevelItem->setText(0, str);
-        // 需要重写
-        str = QString::asprintf("段偏移: %d", data->iph->flag_off);
+        str = "标志位";
+        twoLevelItem = new QTreeWidgetItem(topItem);
+        twoLevelItem->setText(0, str);
+        str = QString::asprintf("DF: %d", data->iph->flag % 2);
+        thrLevelItem = new QTreeWidgetItem(twoLevelItem);
+        thrLevelItem->setText(0, str);
+        str = QString::asprintf("MF: %d", data->iph->flag / 2 % 2);
+        thrLevelItem = new QTreeWidgetItem(twoLevelItem);
+        thrLevelItem->setText(0, str);
+        str = QString::asprintf("片偏移: 0x%x%02x", data->iph->off1, data->iph->off2);
         twoLevelItem = new QTreeWidgetItem(topItem);
         twoLevelItem->setText(0, str);
         str = QString::asprintf("生存期: %d", data->iph->ttl);
@@ -213,13 +222,13 @@ void MainWidget::select_on_tableview(int row, int col) {
         str = QString::asprintf("协议: %d", data->iph->proto);
         twoLevelItem = new QTreeWidgetItem(topItem);
         twoLevelItem->setText(0, str);
-        str = QString::asprintf("首部校验和: 0x%02x", data->iph->check);
+        str = QString::asprintf("首部校验和: 0x%04x", data->iph->check);
         twoLevelItem = new QTreeWidgetItem(topItem);
         twoLevelItem->setText(0, str);
         str = "源IP: " + ui.tableWidget->item(row, 6)->text();
         twoLevelItem = new QTreeWidgetItem(topItem);
         twoLevelItem->setText(0, str);
-        str = "目的IP" + ui.tableWidget->item(row, 7)->text();
+        str = "目的IP: " + ui.tableWidget->item(row, 7)->text();
         twoLevelItem = new QTreeWidgetItem(topItem);
         twoLevelItem->setText(0, str);
 
@@ -236,10 +245,9 @@ void MainWidget::select_on_tableview(int row, int col) {
             str = QString::asprintf("代码: %d", data->icmph->code);
             twoLevelItem = new QTreeWidgetItem(topItem);
             twoLevelItem->setText(0, str);
-            str = QString::asprintf("序号: %d", data->icmph->seq);
             twoLevelItem = new QTreeWidgetItem(topItem);
             twoLevelItem->setText(0, str);
-            str = QString::asprintf("校验和: %d", data->icmph->check);
+            str = QString::asprintf("校验和: 0x%04x", data->icmph->check);
             twoLevelItem = new QTreeWidgetItem(topItem);
             twoLevelItem->setText(0, str);
             break;
@@ -260,38 +268,40 @@ void MainWidget::select_on_tableview(int row, int col) {
             str = QString::asprintf("确认号: %u", data->tcph->ack_seq);
             twoLevelItem = new QTreeWidgetItem(topItem);
             twoLevelItem->setText(0, str);
-            // mark,重写
             str = QString::asprintf("首部长度: %dbyte", data->tcph->doff * 4);
             twoLevelItem = new QTreeWidgetItem(topItem);
             twoLevelItem->setText(0, str);
-            str = QString::asprintf("保留位: %d", data->tcph->res1);
+            str = "标志位";
             twoLevelItem = new QTreeWidgetItem(topItem);
             twoLevelItem->setText(0, str);
+            str = QString::asprintf("保留位: 0x%x%x", data->tcph->res1, data->tcph->res2);
+            thrLevelItem = new QTreeWidgetItem(twoLevelItem);
+            thrLevelItem->setText(0, str);
             str = QString::asprintf("URG: %d", data->tcph->urg);
-            twoLevelItem = new QTreeWidgetItem(topItem);
-            twoLevelItem->setText(0, str);
+            thrLevelItem = new QTreeWidgetItem(twoLevelItem);
+            thrLevelItem->setText(0, str);
             str = QString::asprintf("ACK: %d", data->tcph->ack);
-            twoLevelItem = new QTreeWidgetItem(topItem);
-            twoLevelItem->setText(0, str);
+            thrLevelItem = new QTreeWidgetItem(twoLevelItem);
+            thrLevelItem->setText(0, str);
             str = QString::asprintf("PSH: %d", data->tcph->psh);
-            twoLevelItem = new QTreeWidgetItem(topItem);
-            twoLevelItem->setText(0, str);
+            thrLevelItem = new QTreeWidgetItem(twoLevelItem);
+            thrLevelItem->setText(0, str);
             str = QString::asprintf("RST: %d", data->tcph->rst);
-            twoLevelItem = new QTreeWidgetItem(topItem);
-            twoLevelItem->setText(0, str);
+            thrLevelItem = new QTreeWidgetItem(twoLevelItem);
+            thrLevelItem->setText(0, str);
             str = QString::asprintf("SYN: %d", data->tcph->syn);
-            twoLevelItem = new QTreeWidgetItem(topItem);
-            twoLevelItem->setText(0, str);
+            thrLevelItem = new QTreeWidgetItem(twoLevelItem);
+            thrLevelItem->setText(0, str);
             str = QString::asprintf("FIN: %d", data->tcph->fin);
-            twoLevelItem = new QTreeWidgetItem(topItem);
-            twoLevelItem->setText(0, str);
+            thrLevelItem = new QTreeWidgetItem(twoLevelItem);
+            thrLevelItem->setText(0, str);
             str = QString::asprintf("窗口大小: %d", data->tcph->window);
             twoLevelItem = new QTreeWidgetItem(topItem);
             twoLevelItem->setText(0, str);
-            str = QString::asprintf("校验和: %d", data->tcph->check);
+            str = QString::asprintf("校验和: 0x%04x", data->tcph->check);
             twoLevelItem = new QTreeWidgetItem(topItem);
             twoLevelItem->setText(0, str);
-            str = QString::asprintf("紧急指针: %d", data->tcph->urgPtr);
+            str = QString::asprintf("紧急指针: 0x%04x", data->tcph->urgPtr);
             twoLevelItem = new QTreeWidgetItem(topItem);
             twoLevelItem->setText(0, str);
             break;
@@ -309,7 +319,7 @@ void MainWidget::select_on_tableview(int row, int col) {
             str = QString::asprintf("总长度: %d", data->udph->len);
             twoLevelItem = new QTreeWidgetItem(topItem);
             twoLevelItem->setText(0, str);
-            str = QString::asprintf("校验和: %d", data->udph->check);
+            str = QString::asprintf("校验和: 0x%04x", data->udph->check);
             twoLevelItem = new QTreeWidgetItem(topItem);
             twoLevelItem->setText(0, str);
             break;
@@ -323,21 +333,19 @@ void MainWidget::select_on_tableview(int row, int col) {
         str = "IPv6协议";
         topItem = new QTreeWidgetItem(ui.treeWidget);
         topItem->setText(0, str);
-        // 此处大小端未对齐
-         // 需修改
         str = QString::asprintf("版本: %d", data->ip6h->version);
         twoLevelItem = new QTreeWidgetItem(topItem);
         twoLevelItem->setText(0, str);
-        str = QString::asprintf("流类型: %d", data->ip6h->flowType);
+        str = QString::asprintf("流类型: 0x%x%x", data->ip6h->flowType1, data->ip6h->flowType2);
         twoLevelItem = new QTreeWidgetItem(topItem);
         twoLevelItem->setText(0, str);
-        str = QString::asprintf("流标签: %d", data->ip6h->flowLabel);
+        str = QString::asprintf("流标签: 0x%x%04x", data->ip6h->flowLabel1, data->ip6h->flowLabel2);
         twoLevelItem = new QTreeWidgetItem(topItem);
         twoLevelItem->setText(0, str);
         str = QString::asprintf("有效载荷长度: %d", data->ip6h->plen);
         twoLevelItem = new QTreeWidgetItem(topItem);
         twoLevelItem->setText(0, str);
-        str = QString::asprintf("下一个报头: 0x%02x", data->ip6h->nh);
+        str = QString::asprintf("下一个报头: %d", data->ip6h->nh);
         twoLevelItem = new QTreeWidgetItem(topItem);
         twoLevelItem->setText(0, str);
         str = QString::asprintf("跳跃限制: %d", data->ip6h->hlim);
@@ -363,25 +371,12 @@ void MainWidget::select_on_tableview(int row, int col) {
             str = QString::asprintf("代码: %d", data->icmp6h->code);
             twoLevelItem = new QTreeWidgetItem(topItem);
             twoLevelItem->setText(0, str);
-            str = QString::asprintf("序号: %d", data->icmp6h->seq);
-            twoLevelItem = new QTreeWidgetItem(topItem);
-            twoLevelItem->setText(0, str);
-            str = QString::asprintf("校验和: %d", data->icmp6h->chksum);
-            twoLevelItem = new QTreeWidgetItem(topItem);
-            twoLevelItem->setText(0, str);
-            str = QString::asprintf("选项-类型: %d", data->icmp6h->op_type);
-            twoLevelItem = new QTreeWidgetItem(topItem);
-            twoLevelItem->setText(0, str);
-            str = QString::asprintf("选项-长度: %d", data->icmp6h->op_len);
-            twoLevelItem = new QTreeWidgetItem(topItem);
-            twoLevelItem->setText(0, str);
-            str = QString::asprintf("选项-链路层地址: %02X-%02X-%02X-%02X-%02X-%02X", data->icmp6h->op_ethaddr[0], data->icmp6h->op_ethaddr[1], 
-                data->icmp6h->op_ethaddr[2], data->icmp6h->op_ethaddr[3], data->icmp6h->op_ethaddr[4], data->icmp6h->op_ethaddr[5]);
+            str = QString::asprintf("校验和: 0x%04x", data->icmp6h->chksum);
             twoLevelItem = new QTreeWidgetItem(topItem);
             twoLevelItem->setText(0, str);
             break;
 
-        case 0x06:
+        case 6:
             str = "TCP协议";
             topItem = new QTreeWidgetItem(ui.treeWidget);
             topItem->setText(0, str);
@@ -397,43 +392,45 @@ void MainWidget::select_on_tableview(int row, int col) {
             str = QString::asprintf("确认号: %u", data->tcph->ack_seq);
             twoLevelItem = new QTreeWidgetItem(topItem);
             twoLevelItem->setText(0, str);
-            // mark,重写
-            str = QString::asprintf("首部长度: %dbyte", data->tcph->doff * 4);
+            str = QString::asprintf("首部长度: %d=%dbyte", data->tcph->doff, data->tcph->doff * 4);
             twoLevelItem = new QTreeWidgetItem(topItem);
             twoLevelItem->setText(0, str);
-            str = QString::asprintf("保留位: %d", data->tcph->res1);
+            str = "标志位";
             twoLevelItem = new QTreeWidgetItem(topItem);
             twoLevelItem->setText(0, str);
+            str = QString::asprintf("保留位: 0x%x%x", data->tcph->res1, data->tcph->res2);
+            thrLevelItem = new QTreeWidgetItem(twoLevelItem);
+            thrLevelItem->setText(0, str);
             str = QString::asprintf("URG: %d", data->tcph->urg);
-            twoLevelItem = new QTreeWidgetItem(topItem);
-            twoLevelItem->setText(0, str);
+            thrLevelItem = new QTreeWidgetItem(twoLevelItem);
+            thrLevelItem->setText(0, str);
             str = QString::asprintf("ACK: %d", data->tcph->ack);
-            twoLevelItem = new QTreeWidgetItem(topItem);
-            twoLevelItem->setText(0, str);
+            thrLevelItem = new QTreeWidgetItem(twoLevelItem);
+            thrLevelItem->setText(0, str);
             str = QString::asprintf("PSH: %d", data->tcph->psh);
-            twoLevelItem = new QTreeWidgetItem(topItem);
-            twoLevelItem->setText(0, str);
+            thrLevelItem = new QTreeWidgetItem(twoLevelItem);
+            thrLevelItem->setText(0, str);
             str = QString::asprintf("RST: %d", data->tcph->rst);
-            twoLevelItem = new QTreeWidgetItem(topItem);
-            twoLevelItem->setText(0, str);
+            thrLevelItem = new QTreeWidgetItem(twoLevelItem);
+            thrLevelItem->setText(0, str);
             str = QString::asprintf("SYN: %d", data->tcph->syn);
-            twoLevelItem = new QTreeWidgetItem(topItem);
-            twoLevelItem->setText(0, str);
+            thrLevelItem = new QTreeWidgetItem(twoLevelItem);
+            thrLevelItem->setText(0, str);
             str = QString::asprintf("FIN: %d", data->tcph->fin);
-            twoLevelItem = new QTreeWidgetItem(topItem);
-            twoLevelItem->setText(0, str);
+            thrLevelItem = new QTreeWidgetItem(twoLevelItem);
+            thrLevelItem->setText(0, str);
             str = QString::asprintf("窗口大小: %d", data->tcph->window);
             twoLevelItem = new QTreeWidgetItem(topItem);
             twoLevelItem->setText(0, str);
-            str = QString::asprintf("校验和: %d", data->tcph->check);
+            str = QString::asprintf("校验和: 0x%04x", data->tcph->check);
             twoLevelItem = new QTreeWidgetItem(topItem);
             twoLevelItem->setText(0, str);
-            str = QString::asprintf("紧急指针: %d", data->tcph->urgPtr);
+            str = QString::asprintf("紧急指针: 0x%04x", data->tcph->urgPtr);
             twoLevelItem = new QTreeWidgetItem(topItem);
             twoLevelItem->setText(0, str);
             break;
 
-        case 0x11:
+        case 17:
             str = "UDP协议";
             topItem = new QTreeWidgetItem(ui.treeWidget);
             topItem->setText(0, str);
@@ -446,7 +443,7 @@ void MainWidget::select_on_tableview(int row, int col) {
             str = QString::asprintf("总长度: %d", data->udph->len);
             twoLevelItem = new QTreeWidgetItem(topItem);
             twoLevelItem->setText(0, str);
-            str = QString::asprintf("校验和: %d", data->udph->check);
+            str = QString::asprintf("校验和: 0x%04x", data->udph->check);
             twoLevelItem = new QTreeWidgetItem(topItem);
             twoLevelItem->setText(0, str);
             break;
@@ -459,35 +456,49 @@ void MainWidget::select_on_tableview(int row, int col) {
     default:
         break;
     }
-    //ui.treeWidget->expandAll();
-
+    ui.treeWidget->expandAll();
+    
     // 对数据格式化显示
-    ui.textEdit->clear();
     unsigned char* pkt = data->pktData;
     int size = data->len;
     unsigned int i = 0;
     int rowcount = 0;
     unsigned char ch;
+
+    ui.plainTextEdit->clear();
+    ui.plainTextEdit->setTabStopDistance(20);
+    // 申请一个进度条窗口
+    QProgressDialog* progressDlg = new QProgressDialog(this);     
+    progressDlg->setWindowModality(Qt::WindowModal);
+    progressDlg->setMinimumDuration(0);
+    progressDlg->setWindowTitle("Please Wait");
+    progressDlg->setLabelText("Loading...");
+    progressDlg->setCancelButtonText(nullptr);
+    progressDlg->setRange(0, size);
+
     for (i; i < size; i+=16) {
         // 显示地址
-        ui.textEdit->append(QString::asprintf("%04x:   ", i));
+        ui.plainTextEdit->appendPlainText(QString::asprintf("%04x:\t\t", i));
         // 显示16进制数据
         rowcount = (size - i) > 16 ? 16 : (size - i);
         for (int j = 0; j < rowcount; j++) {
-            ui.textEdit->insertPlainText(QString::asprintf("%02x  ", pkt[i + j]));
+            ui.plainTextEdit->insertPlainText(QString::asprintf("%02x\t", pkt[i + j]));
         }
         if (rowcount < 16) {
             for (int j = rowcount; j < 16; j++) {
-                ui.textEdit->insertPlainText("    ");
+                ui.plainTextEdit->insertPlainText(QString::asprintf("\t"));
             }
         }
+        ui.plainTextEdit->insertPlainText(QString::asprintf("\t", i));
         // 显示字符数据
         for (int j = 0; j < rowcount; j++) {
             ch = pkt[i + j];
             ch = isprint(ch) ? ch : '.';
-            ui.textEdit->insertPlainText(QString::asprintf("%c", ch));
+            ui.plainTextEdit->insertPlainText(QString::asprintf("%c", ch));
         }
+        progressDlg->setValue(i);
     }
+    progressDlg->setValue(size);
 }
 
 // 接收后端信号，并作出响应

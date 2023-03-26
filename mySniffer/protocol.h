@@ -2,6 +2,8 @@
 /***********************************************
 * 协议报文数据结构
 * 自定义数据结构
+* 网络数据多字节按照大端模式. 需要转换
+* 结构体位域从低位开始赋值,故声明顺序需要置反
 ************************************************/
 
 #define LITTLE_ENDIAN 1234
@@ -45,8 +47,13 @@ typedef struct iphdr {
 
 	unsigned char tos;			// tos服务类型
 	unsigned short tLen;		// 总长度
-	unsigned short id;			// 标识
-	unsigned short flag_off;	// 标志与片偏移
+	unsigned short id;			// 
+	//unsigned short flag_off;	// 标志与片偏移
+	unsigned char off1 : 5;		// 片偏移高5位
+	unsigned char flag : 3;		// 标志位
+	unsigned char off2;			// 片偏移低8位
+
+
 	unsigned char ttl;			// TTL
 	unsigned char proto;		// 协议
 	unsigned short check;		// 首部校验和
@@ -72,13 +79,11 @@ typedef struct tcphdr {
 	unsigned short psh : 1;
 	unsigned short ack : 1;
 	unsigned short urg : 1;
-	unsigned short ece : 1;
-	unsigned short cwr : 1;
+	unsigned short res2 : 2;
 #elif defined(BIG_ENDIAN)
 	unsigned short doff : 4;
 	unsigned short res1 : 4;
-	unsigned short cwr : 1;
-	unsigned short ece : 1;
+	unsigned short res2 : 2;
 	unsigned short urg : 1;
 	unsigned short ack : 1;
 	unsigned short psh : 1;
@@ -108,16 +113,22 @@ typedef struct udphdr {
 typedef struct icmphdr {
 	unsigned char type;			// 类型
 	unsigned char code;			// 代码
-	unsigned char seq;			// 序号
-	unsigned char check;		// 校验和
+	unsigned short check;		// 校验和
 }ICMP_HEADER;
 
 
 // IPv6
 typedef struct ip6hdr {
-	unsigned int version : 4;	// 版本
-	unsigned int flowType : 4;	// 流类型
-	unsigned int flowLabel : 24;// 流标签
+	//unsigned int version : 4;		// 版本
+	//unsigned int flowType : 8;	// 流类型
+	//unsigned int flowLabel : 20;	// 流标签
+
+	unsigned char flowType1 : 4;	// 流类型高4位
+	unsigned char version : 4;		// 版本
+	unsigned char flowLabel1 : 4;	// 流标签高4位
+	unsigned char flowType2 : 4;	// 流类型低4位
+	unsigned short flowLabel2 : 16;	// 流标签低16位
+
 
 	unsigned short plen;		// 有效载荷长度
 	unsigned char nh;			// 下一个报头
@@ -131,11 +142,7 @@ typedef struct ip6hdr {
 typedef struct icmp6hdr {
 	unsigned char type;			// 类型
 	unsigned char code;			// 代码
-	unsigned char seq;			// 序号
-	unsigned char chksum;		// 校验和
-	unsigned char op_type;		// 选项: 类型
-	unsigned char op_len;		// 选项: 长度
-	unsigned char op_ethaddr[6];// 选项: 链路层地址
+	unsigned short chksum;		// 校验和
 }ICMP6_HEADER;
 
 

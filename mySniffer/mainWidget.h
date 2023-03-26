@@ -4,6 +4,7 @@
 #include <qmessagebox.h>
 #include <qheaderview.h>
 #include <qtablewidget.h>
+#include <QProgressDialog>
 #include "ui_mySniffer.h"
 #include "packetCap.h"
 #include "qSignal.h"

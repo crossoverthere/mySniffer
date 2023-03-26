@@ -87,13 +87,16 @@ int parsing_ip(const uchar* pkt, PKTDATA* data, PKTCOUNT* npkt) {
 	data->iph->tos = iph->tos;
 	data->iph->tLen = ntohs(iph->tLen);
 	data->iph->id = ntohs(iph->id);
-	data->iph->flag_off = ntohs(iph->flag_off);
+	//data->iph->flag_off = ntohs(iph->flag_off);
+	data->iph->flag = iph->flag;
+	data->iph->off1 = iph->off1;
+	data->iph->off2 = iph->off2;
 	data->iph->ttl = iph->ttl;
 	data->iph->proto = iph->proto;
 	data->iph->check = ntohs(iph->check);
 	data->iph->srcIP = iph->srcIP;
 	data->iph->destIP = iph->destIP;
-	data->iph->option = iph->option;
+	data->iph->option = ntohs(iph->option);
 
 	npkt->n_ip++;
 	// 解析上层协议
@@ -128,8 +131,11 @@ int parsing_ip6(const uchar* pkt, PKTDATA* data, PKTCOUNT* npkt) {
 
 	// 复制信息
 	data->ip6h->version = ip6h->version;
-	data->ip6h->flowType = ip6h->flowType;
-	data->ip6h->flowLabel = ip6h->flowLabel;
+	data->ip6h->flowType1 = ip6h->flowType1;
+	data->ip6h->flowType2 = ip6h->flowType2;
+	data->ip6h->flowLabel1 = ip6h->flowLabel1;
+	data->ip6h->flowLabel2 = ntohs(ip6h->flowLabel2);
+
 	data->ip6h->plen = ntohs(ip6h->plen);
 	data->ip6h->nh = ip6h->nh;
 	data->ip6h->hlim = ip6h->hlim;
@@ -171,7 +177,6 @@ int parsing_icmp(const uchar* pkt, PKTDATA* data, PKTCOUNT* npkt) {
 	// 复制信息
 	data->icmph->type = icmph->type;
 	data->icmph->code = icmph->code;
-	data->icmph->seq = icmph->seq;
 	data->icmph->check = icmph->check;
 
 	strcpy(data->pktType, "ICMP");
@@ -190,15 +195,9 @@ int parsing_icmp6(const uchar* pkt, PKTDATA* data, PKTCOUNT* npkt) {
 	}
 
 	// 复制信息
-	for (int i = 0; i < 6; i++) {
-		data->icmp6h->op_ethaddr[i] = icmp6h->op_ethaddr[i];
-	}
 	data->icmp6h->type = icmp6h->type;
 	data->icmp6h->code = icmp6h->code;
-	data->icmp6h->seq = icmp6h->seq;
 	data->icmp6h->chksum = icmp6h->chksum;
-	data->icmp6h->op_type = icmp6h->op_type;
-	data->icmp6h->op_len = icmp6h->op_len;
 
 	strcpy(data->pktType, "ICMPv6");
 	npkt->n_icmp6++;
@@ -228,12 +227,11 @@ int parsing_tcp(const uchar* pkt, PKTDATA* data, PKTCOUNT* npkt) {
 	data->tcph->psh = tcph->psh;
 	data->tcph->ack = tcph->ack;
 	data->tcph->urg = tcph->urg;
-	data->tcph->ece = tcph->ece;
-	data->tcph->cwr = tcph->cwr;
-	data->tcph->window = tcph->window;
-	data->tcph->check = tcph->check;
-	data->tcph->urgPtr = tcph->urgPtr;
-	data->tcph->option = tcph->option;
+	data->tcph->res2 = tcph->res2;
+	data->tcph->window = ntohs(tcph->window);
+	data->tcph->check = ntohs(tcph->check);
+	data->tcph->urgPtr = ntohs(tcph->urgPtr);
+	data->tcph->option = ntohs(tcph->option);
 
 	// http分支
 	if (ntohs(tcph->destPort) == 80 || ntohs(tcph->srcPort) == 80) {
@@ -262,7 +260,7 @@ int parsing_udp(const uchar* pkt, PKTDATA* data, PKTCOUNT* npkt) {
 	data->udph->srcPort = ntohs(udph->srcPort);
 	data->udph->destPort = ntohs(udph->destPort);
 	data->udph->len = ntohs(udph->len);
-	data->udph->check = udph->check;
+	data->udph->check = ntohs(udph->check);
 
 	strcpy(data->pktType, "UDP");
 	npkt->n_udp++;
